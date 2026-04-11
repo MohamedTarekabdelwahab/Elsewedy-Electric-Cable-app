@@ -7,6 +7,25 @@ from dataclasses import dataclass
 # --- تنسيق الألوان وإخفاء هوية Streamlit ---
 st.markdown("""
     <style>
+/* تمييز القائمة الجانبية */
+[data-testid="stSidebar"] {
+    background-color: #FFFFFF !important; /* أبيض ناصع ليفصل عن الأوف وايت */
+    border-right: 2px solid #E0E0E0;
+}
+
+/* جعل زر التحميل جذاب بلون السويدي */
+.stDownloadButton button {
+    width: 100%;
+    background-color: #E30613 !important; /* أحمر السويدي الرسمي */
+    color: white !important;
+    font-weight: bold !important;
+    border: none !important;
+    padding: 0.5rem !important;
+}
+.stDownloadButton button:hover {
+    background-color: #b3050f !important; /* درجة أغمق عند الوقوف بالماوس */
+}
+
 }
     /* 1. إخفاء الهيدر (الشريط اللي فوق) */
     header {visibility: hidden;}
