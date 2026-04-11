@@ -4,7 +4,7 @@ import google.generativeai as genai
 # 1. Setup Gemini AI
 os_api_key = "AIzaSyCkK_ppOOX7_xp-pilsf_nKIagM1nJmzic"
 genai.configure(api_key=os_api_key)
-model = genai.GenerativeModel('gemini-pro')
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 # 2. Page Configuration
 st.set_page_config(page_title="Elsewedy Cable Solutions", layout="wide", page_icon="⚡")
