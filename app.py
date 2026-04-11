@@ -8,6 +8,10 @@ from dataclasses import dataclass
 # --- التنسيق الصحيح (انسخ ده واستبدل اللي عندك من سطر 11) ---
 st.markdown("""
     <style>
+/* إخفاء زرار الـ sidebar */
+[data-testid="collapsedControl"] {
+    display: none;
+}
     /* إخفاء كل أدوات Streamlit */
     header {visibility: hidden;}
     footer {visibility: hidden;}
