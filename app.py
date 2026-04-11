@@ -7,6 +7,13 @@ from dataclasses import dataclass
 # --- تنسيق الألوان وإخفاء هوية Streamlit ---
 st.markdown("""
     <style>
+    /* إخفاء زر إغلاق القائمة الجانبية لتظل ثابتة */
+button[kind="headerNoContext"] {
+    display: none;
+}
+section[data-testid="stSidebar"] > div {
+    width: 300px; /* يمكنك التحكم في عرض القائمة من هنا */
+}
     /* 1. إخفاء الهيدر (الشريط اللي فوق) */
     header {visibility: hidden;}
     
