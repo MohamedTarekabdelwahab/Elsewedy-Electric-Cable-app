@@ -1,60 +1,52 @@
 import streamlit as st
 import google.generativeai as genai
 
-# --- إضافة اللوجو ---
-# سيعرض اللوجو من رابط رسمي للسويدي
-logo_url = "https://www.elsewedyelectric.com/media/1001/elsewedy-electric-logo.png"
-st.image(logo_url, width=200)
+# --- 1. إعداد الصفحة (يجب أن يكون أول أمر) ---
+st.set_page_config(page_title="Elsewedy Smart Tool", layout="wide")
 
-# --- القائمة الجانبية ---
-with st.sidebar:
-    st.image(logo_url, width=150)
-    st.title("Contact Expert")
-    st.info("""
-    **Eng. Mohamed Tarek** 📞 +966570514091  
-    📧 Mohamed.abdelwahab@elsewedy.com
-    """)
-    st.write("---")
-    st.caption("Elsewedy Electric - Smart Engineering Solutions")
-
-# --- 1. إعداد الـ API Key ---
-# قسم المفتاح الجديد هنا كالعادة
+# --- 2. إعداد الـ API Key ---
 part1 = "AIzaSyD2J9a9RXLKjkC-"
 part2 = "cw12JR7zxz3t7oVSA-Q"
 
 try:
     genai.configure(api_key=part1 + part2)
-    
-    # حركة ذكية: بنجيب لستة الموديلات المتاحة ونختار أول واحد يدعم الشات
-    available_models = [m.name for m in genai.list_models() 
-                        if 'generateContent' in m.supported_generation_methods]
-    
+    available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
     if available_models:
-        # بنختار أول موديل متاح (غالباً هيكون gemini-pro أو gemini-1.5-flash)
         selected_model = available_models[0]
         model = genai.GenerativeModel(selected_model)
-    else:
-        st.error("No compatible Gemini models found for this API Key.")
 except Exception as e:
     st.error(f"Configuration Error: {e}")
 
-# --- 2. واجهة الموقع ---
-st.set_page_config(page_title="Elsewedy Smart Tool", layout="wide")
-# --- تنسيق الخلفية والألوان ---
+# --- 3. تنسيق الخلفية والألوان CSS ---
 st.markdown("""
     <style>
     .stApp {
-        background-color: #FDFDFD; /* درجة أوف وايت راقية */
+        background-color: #FDFDFD; /* أوف وايت */
     }
-    /* تنسيق الخطوط لجعلها أكثر وضوحاً */
     h1, h2, h3, p {
         color: #1E1E1E !important;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     </style>
     """, unsafe_allow_html=True)
+
+# --- 4. القائمة الجانبية (Sidebar) ---
+logo_url = "https://www.elsewedyelectric.com/media/1001/elsewedy-electric-logo.png"
+with st.sidebar:
+    st.image(logo_url, width=150)
+    st.title("Technical Expert")
+    st.info("""
+    **Eng. Mohamed Tarek** 📞 +966570514091  
+    📧 Mohamed.abdelwahab@elsewedy.com
+    """)
+    st.write("---")
+    st.caption("Elsewedy Electric - Smart Solutions")
+
+# --- 5. واجهة الموقع الرئيسية ---
+st.image(logo_url, width=200)
 st.title("⚡ Elsewedy Electric Smart Tool")
 st.markdown(f"**Connected to:** `{selected_model if 'selected_model' in locals() else 'None'}`")
+st.markdown("---")
 
 query = st.text_input("Ask a technical question about cables:")
 
@@ -63,9 +55,9 @@ if query:
         try:
             response = model.generate_content(query)
             st.markdown(response.text)
-            st.success("Eng. Mohamed Tarek | +966570514091")
+            st.success("Expert Support: Eng. Mohamed Tarek | +966570514091")
         except Exception as e:
-            st.error(f"AI is still sleeping. Error: {e}")
+            st.error(f"Error: {e}")
 
 # Footer
 st.markdown("---")
