@@ -9,22 +9,6 @@ st.markdown("""
     <style>
    st.markdown("""
     <style>
-    /* إخفاء كل أدوات Streamlit */
-    header {visibility: hidden;}
-    footer {visibility: hidden;}
-    #MainMenu {visibility: hidden;}
-    .stApp [data-testid="stHeader"] {
-        display: none;
-    }
-
-    /* ألوان الموقع اللي اخترناها */
-    .stApp {
-        background-color: #F5F5F5; 
-    }
-    .stApp, p, span, h1, h2, h3, h4, label, .stMarkdown, .stTextInput {
-        color: #000000 !important;
-    }
-    </style>
     """, unsafe_allow_html=True)
     
     /* 3. إخفاء القائمة اللي بتبقى على اليمين فوق */
