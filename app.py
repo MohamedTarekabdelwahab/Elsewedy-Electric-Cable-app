@@ -50,7 +50,7 @@ def display_logo(w):
 # 5. القائمة الجانبية (Sidebar)
 with st.sidebar:
     display_logo(150)
-    st.markdown("### 👤 Technical Expert")
+    st.markdown("### 👤 Senior Prescription Engineer")
     st.markdown("""
     **Eng. Mohamed Tarek** 📞 +966570514091  
     📧 Mohamed.abdelwahab@elsewedy.com
