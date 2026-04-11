@@ -1,8 +1,9 @@
 import streamlit as st
 import google.generativeai as genai
+import os
 
 # 1. إعداد الصفحة (يجب أن يكون أول سطر)
-st.set_page_config(page_title="Elsewedy Smart Tool", layout="wide")
+st.set_page_config(page_title="Elsewedy Smart Tool", layout="wide", page_icon="⚡")
 
 # 2. إعداد الـ API Key (ضع مفتاحك المقسم هنا)
 part1 = "AIzaSyD2J9a9RXLKjkC-"
@@ -19,50 +20,75 @@ except Exception as e:
 # 3. تنسيق الألوان (خلفية أوف وايت وكلام أسود صريح)
 st.markdown("""
     <style>
-    /* الخلفية أوف وايت */
     .stApp {
         background-color: #F5F5F5; 
     }
-    /* جعل كل النصوص سوداء وواضحة جداً */
-    .stApp, p, span, h1, h2, h3, label, .stMarkdown {
+    /* توحيد اللون الأسود لكل النصوص */
+    .stApp, p, span, h1, h2, h3, h4, label, .stMarkdown, .stTextInput {
         color: #000000 !important;
-        font-weight: 500;
     }
-    /* تنسيق صندوق الإدخال */
-    .stTextInput input {
-        color: #000000 !important;
-        background-color: #FFFFFF !important;
+    /* تنسيق الخطوط */
+    * {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    /* تنسيق زر التحميل */
+    .stDownloadButton button {
+        background-color: #FF0000; /* أحمر السويدي */
+        color: white !important;
+        border-radius: 5px;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# 4. القائمة الجانبية (Sidebar)
-# رابط لوجو بديل ومضمون
-logo_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Elsewedy_Electric_Logo.svg/1200px-Elsewedy_Electric_Logo.svg.png"
+# 4. وظيفة عرض اللوجو بأمان
+def display_logo(w):
+    if os.path.exists("logo.png"):
+        st.image("logo.png", width=w)
+    else:
+        st.warning("Logo (logo.png) not found on GitHub.")
 
+# 5. القائمة الجانبية (Sidebar)
 with st.sidebar:
-    st.image(logo_url, width=150)
-    st.markdown("### Technical Expert")
+    display_logo(150)
+    st.markdown("### 👤 Technical Expert")
     st.markdown("""
     **Eng. Mohamed Tarek** 📞 +966570514091  
     📧 Mohamed.abdelwahab@elsewedy.com
     """)
+    
+    st.markdown("---")
+    st.subheader("📥 Downloads")
+    
+    # إضافة ملف الـ PDF في السايد بار
+    pdf_path = "EE KSA Brochure.pdf"
+    if os.path.exists(pdf_path):
+        with open(pdf_path, "rb") as f:
+            st.download_button(
+                label="📄 Download EE KSA Brochure",
+                data=f,
+                file_name="Elsewedy_KSA_Brochure.pdf",
+                mime="application/pdf"
+            )
+    else:
+        st.error("Brochure PDF not found.")
 
-# 5. الواجهة الرئيسية
-st.image(logo_url, width=250)
+# 6. الواجهة الرئيسية
+display_logo(200)
 st.title("⚡ Elsewedy Electric Smart Tool")
 st.markdown("---")
 
-query = st.text_input("Ask a technical question about cables:", placeholder="Type your question here...")
+# خانة السؤال
+query = st.text_input("Ask our AI Technical Support about cables:", placeholder="e.g. What is the current carrying capacity of 4x16mm2 PVC cable?")
 
 if query:
     with st.spinner("AI is thinking..."):
         try:
             response = model.generate_content(query)
-            # عرض إجابة الذكاء الاصطناعي
-            st.markdown(response.text)
+            # عرض الإجابة
+            st.markdown("### 🤖 Answer:")
+            st.write(response.text)
             
-            # الرسالة الثابتة المطلوبة بعد كل سؤال
+            # الرسالة الختامية الثابتة بعد كل سؤال
             st.markdown("---")
             st.markdown("#### **For more information Please contact:**")
             st.success("""
@@ -74,4 +100,4 @@ if query:
 
 # Footer
 st.markdown("---")
-st.caption("© 2026 Developed by Eng. Mohamed Tarek | Elsewedy Electric")
+st.caption("© 2026 Developed by Eng. Mohamed Tarek | Elsewedy Electric KSA")
