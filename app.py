@@ -7,7 +7,7 @@ from dataclasses import dataclass
 # --- تنسيق الألوان وإخفاء هوية Streamlit ---
 st.markdown("""
     <style>
-    /* إخفاء زر إغلاق القائمة الجانبية لتظل ثابتة */
+    /* إظهار زر إغلاق القائمة الجانبية لتظل ثابتة */
 button[kind="headerNoContext"] {
     display: none;
 }
