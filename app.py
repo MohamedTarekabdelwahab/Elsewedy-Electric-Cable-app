@@ -1,6 +1,22 @@
 import streamlit as st
 import google.generativeai as genai
 
+# --- إضافة اللوجو ---
+# سيعرض اللوجو من رابط رسمي للسويدي
+logo_url = "https://www.elsewedyelectric.com/media/1001/elsewedy-electric-logo.png"
+st.image(logo_url, width=200)
+
+# --- القائمة الجانبية ---
+with st.sidebar:
+    st.image(logo_url, width=150)
+    st.title("Contact Expert")
+    st.info("""
+    **Eng. Mohamed Tarek** 📞 +966570514091  
+    📧 Mohamed.abdelwahab@elsewedy.com
+    """)
+    st.write("---")
+    st.caption("Elsewedy Electric - Smart Engineering Solutions")
+
 # --- 1. إعداد الـ API Key ---
 # قسم المفتاح الجديد هنا كالعادة
 part1 = "AIzaSyD2J9a9RXLKjkC-"
@@ -24,6 +40,19 @@ except Exception as e:
 
 # --- 2. واجهة الموقع ---
 st.set_page_config(page_title="Elsewedy Smart Tool", layout="wide")
+# --- تنسيق الخلفية والألوان ---
+st.markdown("""
+    <style>
+    .stApp {
+        background-color: #FDFDFD; /* درجة أوف وايت راقية */
+    }
+    /* تنسيق الخطوط لجعلها أكثر وضوحاً */
+    h1, h2, h3, p {
+        color: #1E1E1E !important;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 st.title("⚡ Elsewedy Electric Smart Tool")
 st.markdown(f"**Connected to:** `{selected_model if 'selected_model' in locals() else 'None'}`")
 
