@@ -297,11 +297,11 @@ display_logo(200)
 st.title("⚡ Elsewedy Electric Smart Tool")
 st.markdown("---")
 
-tab1, tab2 = st.tabs(["🔌 Cable Size Calculator", "🤖 AI Technical Support"])
+tab1, tab2 = st.tabs(["🔌 Cable Size Calculator", " Technical Support"])
 
 # ── Tab 1: Cable Calculator ──────────────────
 with tab1:
-    st.subheader("Cable Size Selection — Elsewedy Catalog (IEC 60287)")
+    st.subheader("Cable Size Selection — Elsewedy Catalog ")
     st.markdown("Fill in your project data and get the recommended cable size instantly.")
 
     col1, col2 = st.columns(2)
