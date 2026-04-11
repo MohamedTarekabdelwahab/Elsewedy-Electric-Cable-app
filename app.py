@@ -1,42 +1,43 @@
 import streamlit as st
 import google.generativeai as genai
 
-# --- 1. الـ API Key الجديد ---
-# تأكد إنك حاطط المفتاح الجديد اللي طلعناه من شوية
+# --- 1. إعداد الـ API Key ---
+# قسم المفتاح الجديد هنا كالعادة
 part1 = "AIzaSyD2J9a9RXLKjkC-"
 part2 = "cw12JR7zxz3t7oVSA-Q"
 
 try:
     genai.configure(api_key=part1 + part2)
-    # جربنا 'gemini-1.5-flash' بدون إضافات، ده الاسم الرسمي المستقر
-    model = genai.GenerativeModel('gemini-1.5-flash')
-except:
-    st.error("Setup Error")
+    
+    # حركة ذكية: بنجيب لستة الموديلات المتاحة ونختار أول واحد يدعم الشات
+    available_models = [m.name for m in genai.list_models() 
+                        if 'generateContent' in m.supported_generation_methods]
+    
+    if available_models:
+        # بنختار أول موديل متاح (غالباً هيكون gemini-pro أو gemini-1.5-flash)
+        selected_model = available_models[0]
+        model = genai.GenerativeModel(selected_model)
+    else:
+        st.error("No compatible Gemini models found for this API Key.")
+except Exception as e:
+    st.error(f"Configuration Error: {e}")
 
 # --- 2. واجهة الموقع ---
 st.set_page_config(page_title="Elsewedy Smart Tool", layout="wide")
 st.title("⚡ Elsewedy Electric Smart Tool")
-st.markdown("---")
+st.markdown(f"**Connected to:** `{selected_model if 'selected_model' in locals() else 'None'}`")
 
-user_query = st.text_input("Ask a technical question about cables:")
+query = st.text_input("Ask a technical question about cables:")
 
-if user_query:
+if query:
     with st.spinner("AI is thinking..."):
         try:
-            # هنا بنطلب الرد
-            response = model.generate_content(user_query)
-            st.markdown(f"**Answer:**\n\n{response.text}")
-            st.markdown("---")
-            # توقيعك
-            st.success("""
-            **Contact:** Eng. Mohamed Tarek | +966570514091  
-            Mohamed.abdelwahab@elsewedy.com
-            """)
+            response = model.generate_content(query)
+            st.markdown(response.text)
+            st.success("Eng. Mohamed Tarek | +966570514091")
         except Exception as e:
-            # لو لا قدر الله طلع خطأ تاني، السطر اللي تحت ده هيقولنا الموديلات المتاحة إيه بالظبط
-            st.error(f"Try one more time or refresh. Technical error: {e}")
-            if "404" in str(e):
-                st.warning("Hint: Try changing the model name to 'gemini-pro' in the code.")
+            st.error(f"AI is still sleeping. Error: {e}")
 
 # Footer
+st.markdown("---")
 st.caption("© 2026 Developed by Eng. Mohamed Tarek")
