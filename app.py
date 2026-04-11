@@ -7,12 +7,6 @@ from dataclasses import dataclass
 # --- تنسيق الألوان وإخفاء هوية Streamlit ---
 st.markdown("""
     <style>
-    /* إظهار زر إغلاق القائمة الجانبية لتظل ثابتة */
-button[kind="headerNoContext"] {
-    display: none;
-}
-section[data-testid="stSidebar"] > div {
-    width: 300px; /* يمكنك التحكم في عرض القائمة من هنا */
 }
     /* 1. إخفاء الهيدر (الشريط اللي فوق) */
     header {visibility: hidden;}
@@ -302,6 +296,12 @@ def select_cable(load_kw, voltage_v, phases, pf, length_m,
 
 # ─────────────────────────────────────────────
 # 6. Sidebar
+ /* إظهار زر إغلاق القائمة الجانبية لتظل ثابتة */
+button[kind="headerNoContext"] {
+    display: none;
+}
+section[data-testid="stSidebar"] > div {
+    width: 300px; /* يمكنك التحكم في عرض القائمة من هنا */
 # ─────────────────────────────────────────────
 with st.sidebar:
     display_logo(150)
