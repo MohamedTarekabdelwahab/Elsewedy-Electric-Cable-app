@@ -5,16 +5,18 @@ import os
 from dataclasses import dataclass
 
 # --- تنسيق الألوان وإخفاء هوية Streamlit ---
+# --- التنسيق الصحيح (انسخ ده واستبدل اللي عندك من سطر 11) ---
 st.markdown("""
     <style>
-   st.markdown("""
-    <style>
-    """, unsafe_allow_html=True)
-    
-    /* 3. إخفاء القائمة اللي بتبقى على اليمين فوق */
+    /* إخفاء كل أدوات Streamlit */
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
     #MainMenu {visibility: hidden;}
+    .stApp [data-testid="stHeader"] {
+        display: none;
+    }
 
-    /* باقي التنسيقات بتاعتك */
+    /* ألوان الموقع */
     .stApp {
         background-color: #F5F5F5; 
     }
