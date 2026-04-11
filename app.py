@@ -3,8 +3,8 @@ import google.generativeai as genai
 
 # --- 1. الـ API Key الجديد (قسمه هنا) ---
 # خد أول 10 حروف حطهم في part1 والباقي في part2
-part1 = "AIzaSyCkK_ppOOX7_xp-" 
-part2 = "pilsf_nKIagM1nJmzic"
+part1 = "AIzaSyD2J9a9RXLKjkC-" 
+part2 = "cw12JR7zxz3t7oVSA-Q"
 
 genai.configure(api_key=part1 + part2)
 model = genai.GenerativeModel('gemini-1.5-flash')
