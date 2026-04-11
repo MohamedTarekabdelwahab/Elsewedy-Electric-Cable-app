@@ -7,14 +7,7 @@ from dataclasses import dataclass
 # --- تنسيق الألوان وإخفاء هوية Streamlit ---
 st.markdown("""
     <style>
-    /* كود إخفاء الهيدر والفوتر والمنيو */
-    header {visibility: hidden;}
-    footer {visibility: hidden;}
-    #MainMenu {visibility: hidden;}
-    
-    /* سطر إضافي لضمان مسح المساحة الفاضية اللي فوق */
-    .stApp [data-testid="stHeader"] {
-        display: none;
+   
     }
 /* تمييز القائمة الجانبية */
 [data-testid="stSidebar"] {
