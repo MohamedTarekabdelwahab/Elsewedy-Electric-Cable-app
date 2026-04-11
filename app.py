@@ -7,33 +7,25 @@ from dataclasses import dataclass
 # --- تنسيق الألوان وإخفاء هوية Streamlit ---
 st.markdown("""
     <style>
-   
-    }
-/* تمييز القائمة الجانبية */
-[data-testid="stSidebar"] {
-    background-color: #FFFFFF !important; /* أبيض ناصع ليفصل عن الأوف وايت */
-    border-right: 2px solid #E0E0E0;
-}
-
-/* جعل زر التحميل جذاب بلون السويدي */
-.stDownloadButton button {
-    width: 100%;
-    background-color: #E30613 !important; /* أحمر السويدي الرسمي */
-    color: white !important;
-    font-weight: bold !important;
-    border: none !important;
-    padding: 0.5rem !important;
-}
-.stDownloadButton button:hover {
-    background-color: #b3050f !important; /* درجة أغمق عند الوقوف بالماوس */
-}
-
-}
-    /* 1. إخفاء الهيدر (الشريط اللي فوق) */
+   st.markdown("""
+    <style>
+    /* إخفاء كل أدوات Streamlit */
     header {visibility: hidden;}
-    
-    /* 2. إخفاء الفوتر (Made with Streamlit) */
     footer {visibility: hidden;}
+    #MainMenu {visibility: hidden;}
+    .stApp [data-testid="stHeader"] {
+        display: none;
+    }
+
+    /* ألوان الموقع اللي اخترناها */
+    .stApp {
+        background-color: #F5F5F5; 
+    }
+    .stApp, p, span, h1, h2, h3, h4, label, .stMarkdown, .stTextInput {
+        color: #000000 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
     
     /* 3. إخفاء القائمة اللي بتبقى على اليمين فوق */
     #MainMenu {visibility: hidden;}
