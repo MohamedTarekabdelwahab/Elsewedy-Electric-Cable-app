@@ -4,35 +4,38 @@ import math
 import os
 from dataclasses import dataclass
 
-# --- تنسيق الألوان وإخفاء هوية Streamlit ---
-# --- التنسيق الصحيح (انسخ ده واستبدل اللي عندك من سطر 11) ---
-st.markdown("""
-    <style>
-/* إخفاء زرار الـ sidebar */
-[data-testid="collapsedControl"] {
-    display: none;
-}
-    /* إخفاء كل أدوات Streamlit */
-    header {visibility: hidden;}
-    footer {visibility: hidden;}
-    #MainMenu {visibility: hidden;}
-    .stApp [data-testid="stHeader"] {
-        display: none;
-    }
-
-    /* ألوان الموقع */
-    .stApp {
-        background-color: #F5F5F5; 
-    }
-    .stApp, p, span, h1, h2, h3, h4, label, .stMarkdown, .stTextInput {
-        color: #000000 !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
 # ─────────────────────────────────────────────
 # 1. Page config — MUST be first Streamlit call
 # ─────────────────────────────────────────────
 st.set_page_config(page_title="Elsewedy Smart Tool", layout="wide")
+
+# --- تنسيق الألوان وإخفاء هوية Streamlit ---
+st.markdown("""
+    <style>
+    [data-testid="collapsedControl"] { display: none; }
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
+    #MainMenu {visibility: hidden;}
+    .stApp [data-testid="stHeader"] { display: none; }
+    .stApp { background-color: #F5F5F5; }
+    .stApp, p, span, h1, h2, h3, h4, label, .stMarkdown, .stTextInput {
+        color: #000000 !important;
+    }
+    * { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .stDownloadButton button {
+        background-color: #CC0000;
+        color: white !important;
+        border-radius: 5px;
+    }
+    .result-box {
+        background: #ffffff;
+        border-left: 4px solid #CC0000;
+        border-radius: 6px;
+        padding: 1rem 1.25rem;
+        margin-top: 1rem;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────
 # 2. API Key setup
@@ -53,41 +56,16 @@ except Exception as e:
     st.error(f"AI Configuration Error: {e}")
 
 # ─────────────────────────────────────────────
-# 3. Styling
-# ─────────────────────────────────────────────
-st.markdown("""
-<style>
-.stApp { background-color: #F5F5F5; }
-.stApp, p, span, h1, h2, h3, h4, label, .stMarkdown, .stTextInput {
-    color: #000000 !important;
-}
-* { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-.stDownloadButton button {
-    background-color: #CC0000;
-    color: white !important;
-    border-radius: 5px;
-}
-.result-box {
-    background: #ffffff;
-    border-left: 4px solid #CC0000;
-    border-radius: 6px;
-    padding: 1rem 1.25rem;
-    margin-top: 1rem;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# ─────────────────────────────────────────────
-# 4. Logo helper
+# 3. Logo helper
 # ─────────────────────────────────────────────
 def display_logo(w):
     if os.path.exists("logo.png"):
         st.image("logo.png", width=w)
     else:
-        st.markdown(f"###  Elsewedy Electric")
+        st.markdown(f"### Elsewedy Electric")
 
 # ─────────────────────────────────────────────
-# 5. Cable Selection — Catalog & Logic
+# 4. Cable Selection — Catalog & Logic
 # ─────────────────────────────────────────────
 
 CATALOG = {
@@ -181,7 +159,7 @@ CATALOG = {
             ],
             "duct": [
                 {"s": 16, "Iz": 52}, {"s": 25, "Iz": 66}, {"s": 35, "Iz": 82},
-                {"s": 50, "Iz": 99}, {"s": 70, "Iz": 124}, {"s": 95, "Iz": 150},
+                {"s": 50, "Iz": 99}, {"s": 124, "Iz": 124}, {"s": 95, "Iz": 150},
                 {"s": 120, "Iz": 174}, {"s": 150, "Iz": 198}, {"s": 185, "Iz": 226},
                 {"s": 240, "Iz": 265}, {"s": 300, "Iz": 304},
             ],
@@ -196,6 +174,11 @@ TEMP_DERATING = {
 
 GROUP_DERATING = {1:1.00, 2:0.87, 3:0.79, 4:0.75, 5:0.72, 6:0.70}
 
+# معاملات السويدي للتربة والعمق (LV)
+SOIL_THERMAL_MAP = {1.0: 1.05, 1.2: 1.00, 1.5: 0.92, 2.0: 0.83, 2.5: 0.76, 3.0: 0.71}
+DEPTH_DIRECT_MAP = {0.5: 1.03, 0.6: 1.02, 0.8: 1.00, 1.0: 0.98, 1.25: 0.96, 1.5: 0.95}
+DEPTH_DUCT_MAP   = {0.5: 1.00, 0.6: 0.99, 0.8: 0.98, 1.0: 0.96, 1.25: 0.95, 1.5: 0.94}
+
 RESISTANCE = {
     "cu": {1.5:12.10, 2.5:7.41, 4:4.61, 6:3.08, 10:1.83, 16:1.15, 25:0.727,
            35:0.524, 50:0.387, 70:0.268, 95:0.193, 120:0.153, 150:0.124,
@@ -205,7 +188,6 @@ RESISTANCE = {
 }
 REACTANCE_DEFAULT = 0.08
 
-
 @dataclass
 class CableResult:
     size_mm2: float
@@ -213,15 +195,14 @@ class CableResult:
     full_load_current: float
     temp_derating: float
     group_derating: float
+    soil_thermal_derating: float
+    depth_derating: float
     effective_capacity: float
     utilisation_pct: float
     voltage_drop_v: float
     voltage_drop_pct: float
     vdrop_ok: bool
     warnings: list
-import streamlit as st
-
-
 
 def get_temp_derating(insulation, temp_c):
     table = TEMP_DERATING[insulation]
@@ -234,10 +215,9 @@ def get_temp_derating(insulation, temp_c):
             return table[t1] + (table[t2]-table[t1]) * (temp_c-t1)/(t2-t1)
     return table[temps[-1]]
 
-
 def select_cable(load_kw, voltage_v, phases, pf, length_m,
                  temp_c, conductor, insulation, installation,
-                 max_vdrop_pct, num_cables):
+                 max_vdrop_pct, num_cables, soil_thermal, burial_depth):
     warnings = []
     sinpf = math.sqrt(max(0, 1 - pf**2))
 
@@ -247,10 +227,21 @@ def select_cable(load_kw, voltage_v, phases, pf, length_m,
     else:
         IFL = (load_kw * 1000) / (voltage_v * pf)
 
-    # Derating
+    # Derating Calculation
     t_derate = get_temp_derating(insulation, temp_c)
     g_derate = GROUP_DERATING.get(num_cables, 0.65)
-    total_derate = t_derate * g_derate
+    
+    # Soil Thermal & Depth Derating (Only for underground)
+    st_derate = 1.0
+    d_derate = 1.0
+    if installation in ["ground", "duct"]:
+        st_derate = SOIL_THERMAL_MAP.get(soil_thermal, 1.0)
+        if installation == "duct":
+            d_derate = DEPTH_DUCT_MAP.get(burial_depth, 1.0)
+        else:
+            d_derate = DEPTH_DIRECT_MAP.get(burial_depth, 1.0)
+
+    total_derate = t_derate * g_derate * st_derate * d_derate
     I_required = IFL / total_derate
 
     table = CATALOG[conductor][insulation][installation]
@@ -279,7 +270,7 @@ def select_cable(load_kw, voltage_v, phases, pf, length_m,
                     break
         vd_v, vd_pct = vdrop_pct(chosen["s"])
         if vd_pct > max_vdrop_pct:
-            warnings.append(f"Voltage drop ({vd_pct:.2f}%) still exceeds {max_vdrop_pct}%. Consider splitting circuit.")
+            warnings.append(f"Voltage drop ({vd_pct:.2f}%) still exceeds {max_vdrop_pct}%.")
 
     eff_cap = chosen["Iz"] * total_derate
     util = (IFL / eff_cap * 100) if eff_cap > 0 else 0
@@ -290,6 +281,8 @@ def select_cable(load_kw, voltage_v, phases, pf, length_m,
         full_load_current=round(IFL, 2),
         temp_derating=round(t_derate, 3),
         group_derating=round(g_derate, 3),
+        soil_thermal_derating=round(st_derate, 3),
+        depth_derating=round(d_derate, 3),
         effective_capacity=round(eff_cap, 2),
         utilisation_pct=round(util, 1),
         voltage_drop_v=round(vd_v, 3),
@@ -298,14 +291,13 @@ def select_cable(load_kw, voltage_v, phases, pf, length_m,
         warnings=warnings,
     )
 
-
 # ─────────────────────────────────────────────
-# 6. Sidebar
+# 5. Sidebar
 # ─────────────────────────────────────────────
 with st.sidebar:
     display_logo(150)
     st.markdown("### 👤 Senior Prescription Engineer")
-    st.markdown("**Eng. Mohamed Tarek**  \n📞 +966570514091  \n📧 Mohamed.abdelwahab@elsewedy.com")
+    st.markdown("**Eng. Mohamed Tarek** \n📞 +966570514091  \n📧 Mohamed.abdelwahab@elsewedy.com")
     st.markdown("---")
     st.subheader("📥 Downloads")
     pdf_path = "EE KSA Brochure.pdf"
@@ -314,11 +306,9 @@ with st.sidebar:
             st.download_button("📄 Download EE KSA Brochure", f,
                                file_name="Elsewedy_KSA_Brochure.pdf",
                                mime="application/pdf")
-    else:
-        st.info("Brochure PDF not found.")
 
 # ─────────────────────────────────────────────
-# 7. Main UI — Tabs
+# 6. Main UI
 # ─────────────────────────────────────────────
 display_logo(200)
 st.title(" Elsewedy Electric Smart Tool")
@@ -326,36 +316,40 @@ st.markdown("---")
 
 tab1, tab2 = st.tabs(["🔌 Cable Size Calculator", " Technical Support"])
 
-# ── Tab 1: Cable Calculator ──────────────────
 with tab1:
     st.subheader("Cable Size Selection — Elsewedy Catalog ")
-    st.markdown("Fill in your project data and get the recommended cable size instantly.")
-
+    
     col1, col2 = st.columns(2)
-
     with col1:
         st.markdown("**Load Data**")
-        load_kw     = st.number_input("Load (kW)", min_value=0.1, value=50.0, step=0.5)
-        voltage_v   = st.selectbox("System Voltage", [230, 400, 415], index=1)
-        phases      = st.radio("System Type", [3, 1], format_func=lambda x: "Three Phase (3Ø)" if x==3 else "Single Phase (1Ø)")
-        pf          = st.slider("Power Factor (cosφ)", 0.5, 1.0, 0.85, 0.01)
+        load_kw = st.number_input("Load (kW)", min_value=0.1, value=50.0, step=0.5)
+        voltage_v = st.selectbox("System Voltage", [230, 400, 415], index=1)
+        phases = st.radio("System Type", [3, 1], format_func=lambda x: "Three Phase (3Ø)" if x==3 else "Single Phase (1Ø)")
+        pf = st.slider("Power Factor (cosφ)", 0.5, 1.0, 0.85, 0.01)
 
     with col2:
         st.markdown("**Cable & Installation**")
-        length_m    = st.number_input("Cable Length (m)", min_value=1.0, value=100.0, step=5.0)
-        temp_c      = st.selectbox("Ambient Temperature (°C)", [25, 30, 35, 40, 45, 50, 55], index=3,
-                                    help="Saudi default: 40°C")
-        conductor   = st.selectbox("Conductor Material", ["cu", "al"],
-                                    format_func=lambda x: "Copper (Cu)" if x=="cu" else "Aluminium (Al)")
-        insulation  = st.selectbox("Insulation Type", ["xlpe", "pvc"],
-                                    format_func=lambda x: "XLPE (90°C)" if x=="xlpe" else "PVC (70°C)")
-        installation = st.selectbox("Installation Method",
-                                     ["air", "ground", "duct"],
-                                     format_func=lambda x: {
-                                         "air":    "In air / Cable tray",
-                                         "ground": "Direct buried",
-                                         "duct":   "In underground duct"}[x])
+        length_m = st.number_input("Cable Length (m)", min_value=1.0, value=100.0, step=5.0)
+        temp_c = st.selectbox("Ambient Temperature (°C)", [25, 30, 35, 40, 45, 50, 55], index=3)
+        conductor = st.selectbox("Conductor Material", ["cu", "al"], format_func=lambda x: "Copper (Cu)" if x=="cu" else "Aluminium (Al)")
+        insulation = st.selectbox("Insulation Type", ["xlpe", "pvc"], format_func=lambda x: "XLPE (90°C)" if x=="xlpe" else "PVC (70°C)")
+        installation = st.selectbox("Installation Method", ["air", "ground", "duct"],
+                                    format_func=lambda x: {"air":"In air / Tray", "ground":"Direct buried", "duct":"In duct"}[x])
 
+    # New Section for Soil and Burial Depth
+    if installation in ["ground", "duct"]:
+        st.markdown("---")
+        st.markdown("**Soil & Burial Conditions (Elsewedy LV Standard)**")
+        sc1, sc2 = st.columns(2)
+        with sc1:
+            soil_thermal = st.selectbox("Soil Thermal Resistivity (K.m/W)", options=list(SOIL_THERMAL_MAP.keys()), index=1)
+        with sc2:
+            burial_depth = st.selectbox("Depth of Laying (m)", options=list(DEPTH_DIRECT_MAP.keys()), index=2)
+    else:
+        soil_thermal = 1.2
+        burial_depth = 0.8
+
+    st.markdown("---")
     col3, col4 = st.columns(2)
     with col3:
         max_vdrop = st.selectbox("Max Voltage Drop (%)", [3.0, 5.0], index=1)
@@ -363,74 +357,40 @@ with tab1:
         num_cables = st.selectbox("Number of Cables (grouping)", [1,2,3,4,5,6], index=0)
 
     if st.button("⚡ Calculate Cable Size", use_container_width=True):
-        try:
-            res = select_cable(load_kw, voltage_v, phases, pf, length_m,
-                               temp_c, conductor, insulation, installation,
-                               max_vdrop, num_cables)
+        res = select_cable(load_kw, voltage_v, phases, pf, length_m, temp_c, conductor, insulation, installation, max_vdrop, num_cables, soil_thermal, burial_depth)
 
-            st.markdown("---")
-            st.markdown("### Results")
+        st.markdown("### Results")
+        col_a, col_b, col_c = st.columns(3)
+        col_a.metric("Recommended Size", f"{res.size_mm2} mm²", f"{conductor.upper()} {insulation.upper()}")
+        col_b.metric("Load Current", f"{res.full_load_current} A", f"Iz = {res.catalog_iz} A")
+        col_c.metric("Voltage Drop", f"{res.voltage_drop_pct}%", f"{'✓ OK' if res.vdrop_ok else '✗ FAIL'}")
 
-            # Big result
-            cond_label = "Cu" if conductor == "cu" else "Al"
-            ins_label  = insulation.upper()
-            col_a, col_b, col_c = st.columns(3)
-            col_a.metric("Recommended Size", f"{res.size_mm2} mm²",
-                         f"{cond_label} {ins_label}")
-            col_b.metric("Full Load Current", f"{res.full_load_current} A",
-                         f"Iz = {res.catalog_iz} A")
-            vd_delta = f"Limit {max_vdrop}% — {'✓ OK' if res.vdrop_ok else '✗ FAIL'}"
-            col_c.metric("Voltage Drop", f"{res.voltage_drop_pct}%", vd_delta)
+        st.markdown("**Calculation Details**")
+        details = {
+            "Temp derating factor": f"× {res.temp_derating}",
+            "Group derating factor": f"× {res.group_derating}",
+            "Soil Thermal derating": f"× {res.soil_thermal_derating}" if installation != "air" else "N/A",
+            "Depth derating factor": f"× {res.depth_derating}" if installation != "air" else "N/A",
+            "Effective capacity": f"{res.effective_capacity} A",
+            "Voltage drop": f"{res.voltage_drop_v} V",
+        }
+        for k, v in details.items():
+            c1, c2 = st.columns([2, 3])
+            c1.markdown(f"<span style='color:#888'>{k}</span>", unsafe_allow_html=True)
+            c2.markdown(f"**{v}**")
 
-            # Details table
-            st.markdown("**Calculation Details**")
-            details = {
-                "Temp derating factor":  f"× {res.temp_derating}  (at {temp_c}°C)",
-                "Group derating factor": f"× {res.group_derating}  ({num_cables} cable(s))",
-                "Effective cable capacity": f"{res.effective_capacity} A",
-                "Cable utilisation":     f"{res.utilisation_pct}%",
-                "Voltage drop":          f"{res.voltage_drop_v} V  ({res.voltage_drop_pct}%)",
-                "Standard":              "IEC 60287 / IEC 60502-1",
-            }
-            for k, v in details.items():
-                c1, c2 = st.columns([2, 3])
-                c1.markdown(f"<span style='color:#888'>{k}</span>", unsafe_allow_html=True)
-                c2.markdown(f"**{v}**")
+        if res.warnings:
+            for w in res.warnings: st.warning(f"⚠ {w}")
+        else:
+            st.success("✓ Cable selection is within all limits.")
 
-            # Warnings
-            if res.warnings:
-                for w in res.warnings:
-                    st.warning(f"⚠ {w}")
-            else:
-                st.success("✓ Cable selection is within all limits.")
-
-        except Exception as e:
-            st.error(f"Calculation error: {e}")
-
-# ── Tab 2: AI Support ────────────────────────
 with tab2:
     st.subheader("🤖 AI Technical Support")
-    query = st.text_input("Ask about cables, standards, or specifications:",
-                          placeholder="e.g. What is the current rating of 4×16mm² PVC cable?")
+    query = st.text_input("Ask about cables, standards, or specifications:")
+    if query and model:
+        with st.spinner("AI is thinking..."):
+            response = model.generate_content(query)
+            st.write(response.text)
 
-    if query:
-        if model is None:
-            st.error("AI model not available. Check your API key.")
-        else:
-            with st.spinner("AI is thinking..."):
-                try:
-                    response = model.generate_content(query)
-                    st.markdown("### 🤖 Answer:")
-                    st.write(response.text)
-                except Exception as e:
-                    st.error(f"AI Error: {e}")
-
-        st.markdown("---")
-        st.markdown("#### For more information, please contact:")
-        st.success("**Eng. Mohamed Tarek**  \n📞 +966570514091  \n📧 Mohamed.abdelwahab@elsewedy.com")
-
-# ─────────────────────────────────────────────
-# 8. Footer
-# ─────────────────────────────────────────────
 st.markdown("---")
 st.caption("© 2026 Developed by Eng. Mohamed Tarek | Elsewedy Electric KSA")
