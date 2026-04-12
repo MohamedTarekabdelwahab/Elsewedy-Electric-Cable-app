@@ -541,7 +541,7 @@ with tab1:
     with col1:
         st.markdown("**Load Data**")
         load_kw   = st.number_input("Load (kW)", min_value=0.1, value=50.0, step=0.5)
-        voltage_v = st.selectbox("System Voltage", [230, 400, 415], index=1)
+        voltage_v = st.selectbox("System Voltage", [230, 400], index=1)
         phases    = st.radio("System Type", [3, 1],
                              format_func=lambda x: "Three Phase (3Ø)" if x == 3 else "Single Phase (1Ø)")
         pf        = st.slider("Power Factor (cosφ)", 0.5, 1.0, 0.85, 0.01)
