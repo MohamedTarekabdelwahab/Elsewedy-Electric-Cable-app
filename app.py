@@ -127,54 +127,60 @@ CATALOG = {
             ],
         },
         "pvc": {
-            # page 78 — 3-core Cu/PVC/SWA armoured
+            # page 70 — 3-core Cu/PVC unarmoured (CORRECT SOURCE)
             "air": [
-                {"s": 4,    "Iz": 36},
-                {"s": 6,    "Iz": 45},
-                {"s": 10,   "Iz": 61},
-                {"s": 16,   "Iz": 83},
-                {"s": 25,   "Iz": 106},
-                {"s": 35,   "Iz": 130},
-                {"s": 50,   "Iz": 157},
-                {"s": 70,   "Iz": 198},
-                {"s": 95,   "Iz": 242},
-                {"s": 120,  "Iz": 277},
-                {"s": 150,  "Iz": 317},
-                {"s": 185,  "Iz": 362},
-                {"s": 240,  "Iz": 425},
-                {"s": 300,  "Iz": 484},
+                {"s": 1.5,  "Iz": 20},
+                {"s": 2.5,  "Iz": 24},
+                {"s": 4,    "Iz": 34},
+                {"s": 6,    "Iz": 43},
+                {"s": 10,   "Iz": 59},
+                {"s": 16,   "Iz": 80},
+                {"s": 25,   "Iz": 102},
+                {"s": 35,   "Iz": 125},
+                {"s": 50,   "Iz": 151},
+                {"s": 70,   "Iz": 191},
+                {"s": 95,   "Iz": 235},
+                {"s": 120,  "Iz": 270},
+                {"s": 150,  "Iz": 310},
+                {"s": 185,  "Iz": 357},
+                {"s": 240,  "Iz": 423},
+                {"s": 300,  "Iz": 486},
             ],
             "ground": [
-                {"s": 4,    "Iz": 45},
-                {"s": 6,    "Iz": 58},
+                {"s": 1.5,  "Iz": 27},
+                {"s": 2.5,  "Iz": 35},
+                {"s": 4,    "Iz": 46},
+                {"s": 6,    "Iz": 59},
                 {"s": 10,   "Iz": 78},
-                {"s": 16,   "Iz": 97},
-                {"s": 25,   "Iz": 129},
+                {"s": 16,   "Iz": 98},
+                {"s": 25,   "Iz": 130},
                 {"s": 35,   "Iz": 156},
-                {"s": 50,   "Iz": 188},
-                {"s": 70,   "Iz": 231},
-                {"s": 95,   "Iz": 276},
-                {"s": 120,  "Iz": 314},
-                {"s": 150,  "Iz": 350},
-                {"s": 185,  "Iz": 394},
-                {"s": 240,  "Iz": 454},
-                {"s": 300,  "Iz": 507},
+                {"s": 50,   "Iz": 189},
+                {"s": 70,   "Iz": 232},
+                {"s": 95,   "Iz": 278},
+                {"s": 120,  "Iz": 315},
+                {"s": 150,  "Iz": 354},
+                {"s": 185,  "Iz": 399},
+                {"s": 240,  "Iz": 462},
+                {"s": 300,  "Iz": 521},
             ],
             "duct": [
+                {"s": 1.5,  "Iz": 21},
+                {"s": 2.5,  "Iz": 27},
                 {"s": 4,    "Iz": 36},
                 {"s": 6,    "Iz": 43},
                 {"s": 10,   "Iz": 57},
                 {"s": 16,   "Iz": 71},
-                {"s": 25,   "Iz": 97},
-                {"s": 35,   "Iz": 117},
-                {"s": 50,   "Iz": 140},
-                {"s": 70,   "Iz": 174},
-                {"s": 95,   "Iz": 210},
-                {"s": 120,  "Iz": 238},
-                {"s": 150,  "Iz": 271},
-                {"s": 185,  "Iz": 307},
-                {"s": 240,  "Iz": 358},
-                {"s": 300,  "Iz": 405},
+                {"s": 25,   "Iz": 94},
+                {"s": 35,   "Iz": 114},
+                {"s": 50,   "Iz": 136},
+                {"s": 70,   "Iz": 169},
+                {"s": 95,   "Iz": 205},
+                {"s": 120,  "Iz": 234},
+                {"s": 150,  "Iz": 266},
+                {"s": 185,  "Iz": 303},
+                {"s": 240,  "Iz": 357},
+                {"s": 300,  "Iz": 406},
             ],
         },
     },
@@ -222,45 +228,45 @@ CATALOG = {
             ],
         },
         "pvc": {
-            # page 76 & 98 — 3-core Al/PVC armoured
+            # page 72 — 3-core Al/PVC unarmoured (CORRECT SOURCE)
             "air": [
-                {"s": 16,  "Iz": 60},
-                {"s": 25,  "Iz": 80},
-                {"s": 35,  "Iz": 98},
-                {"s": 50,  "Iz": 118},
+                {"s": 16,  "Iz": 59},
+                {"s": 25,  "Iz": 79},
+                {"s": 35,  "Iz": 97},
+                {"s": 50,  "Iz": 117},
                 {"s": 70,  "Iz": 148},
-                {"s": 95,  "Iz": 184},
-                {"s": 120, "Iz": 212},
-                {"s": 150, "Iz": 242},
+                {"s": 95,  "Iz": 182},
+                {"s": 120, "Iz": 210},
+                {"s": 150, "Iz": 241},
                 {"s": 185, "Iz": 278},
-                {"s": 240, "Iz": 330},
-                {"s": 300, "Iz": 380},
+                {"s": 240, "Iz": 331},
+                {"s": 300, "Iz": 381},
             ],
             "ground": [
-                {"s": 16,  "Iz": 77},
-                {"s": 25,  "Iz": 103},
-                {"s": 35,  "Iz": 125},
-                {"s": 50,  "Iz": 150},
-                {"s": 70,  "Iz": 190},
-                {"s": 95,  "Iz": 231},
-                {"s": 120, "Iz": 269},
-                {"s": 150, "Iz": 304},
-                {"s": 185, "Iz": 347},
-                {"s": 240, "Iz": 413},
-                {"s": 300, "Iz": 473},
+                {"s": 16,  "Iz": 78},
+                {"s": 25,  "Iz": 101},
+                {"s": 35,  "Iz": 121},
+                {"s": 50,  "Iz": 147},
+                {"s": 70,  "Iz": 180},
+                {"s": 95,  "Iz": 216},
+                {"s": 120, "Iz": 245},
+                {"s": 150, "Iz": 275},
+                {"s": 185, "Iz": 311},
+                {"s": 240, "Iz": 362},
+                {"s": 300, "Iz": 409},
             ],
             "duct": [
-                {"s": 16,  "Iz": 57},
-                {"s": 25,  "Iz": 75},
-                {"s": 35,  "Iz": 92},
-                {"s": 50,  "Iz": 111},
-                {"s": 70,  "Iz": 140},
-                {"s": 95,  "Iz": 171},
-                {"s": 120, "Iz": 197},
-                {"s": 150, "Iz": 225},
-                {"s": 185, "Iz": 260},
-                {"s": 240, "Iz": 308},
-                {"s": 300, "Iz": 355},
+                {"s": 16,  "Iz": 56},
+                {"s": 25,  "Iz": 73},
+                {"s": 35,  "Iz": 89},
+                {"s": 50,  "Iz": 106},
+                {"s": 70,  "Iz": 131},
+                {"s": 95,  "Iz": 159},
+                {"s": 120, "Iz": 182},
+                {"s": 150, "Iz": 206},
+                {"s": 185, "Iz": 236},
+                {"s": 240, "Iz": 279},
+                {"s": 300, "Iz": 318},
             ],
         },
     },
@@ -270,17 +276,30 @@ CATALOG = {
 # 5. Derating Tables — Elsewedy Catalog
 # ─────────────────────────────────────────────
 
-TEMP_DERATING = {
+# ── Table 3 — Air temp derating (base 30°C) — page 19
+TEMP_DERATING_AIR = {
     "xlpe": {15:1.15, 20:1.10, 25:1.05, 30:1.00,
               35:0.95, 40:0.90, 45:0.84, 50:0.78, 55:0.72},
     "pvc":  {15:1.21, 20:1.15, 25:1.07, 30:1.00,
               35:0.92, 40:0.84, 45:0.75, 50:0.66, 55:0.55},
 }
-
-GROUP_DERATING    = {1:1.00, 2:0.87, 3:0.79, 4:0.75, 5:0.72, 6:0.70}
-SOIL_THERMAL_MAP  = {0.8:1.05, 1.0:1.03, 1.2:1.00, 1.5:0.92, 2.0:0.83, 2.5:0.76, 3.0:0.71}
-DEPTH_DIRECT_MAP  = {0.5:1.00, 0.6:0.98, 0.8:0.96, 1.0:0.94, 1.25:0.92, 1.5:0.91}
-DEPTH_DUCT_MAP    = {0.5:1.00, 0.6:0.98, 0.8:0.97, 1.0:0.96, 1.25:0.95, 1.5:0.94}
+# ── Table 4 — Ground temp derating (base 20°C) — page 19
+TEMP_DERATING_GROUND = {
+    "xlpe": {15:1.04, 20:1.00, 25:0.96, 30:0.93,
+              35:0.89, 40:0.85, 45:0.80, 50:0.76, 55:0.71},
+    "pvc":  {15:1.05, 20:1.00, 25:0.95, 30:0.89,
+              35:0.84, 40:0.77, 45:0.71, 50:0.63, 55:0.55},
+}
+# ── Table 9 — Grouping multicore in ground (trefoil touching) — page 21
+GROUP_DERATING_GROUND = {1:1.00, 2:0.81, 3:0.69, 4:0.62, 5:0.58, 6:0.54}
+# ── Table 10 — Grouping multicore in air (1 tray, touching) — page 21
+GROUP_DERATING_AIR    = {1:1.00, 2:0.88, 3:0.82, 4:0.79, 5:0.76, 6:0.73}
+# ── Table 6 — Soil thermal resistivity — page 20
+SOIL_THERMAL_DIRECT = {0.8:1.05, 0.9:1.03, 1.0:1.00, 1.2:0.92, 1.5:0.83, 2.0:0.73, 2.5:0.66, 3.0:0.60}
+SOIL_THERMAL_DUCT   = {0.8:1.03, 0.9:1.02, 1.0:1.00, 1.2:0.95, 1.5:0.89, 2.0:0.81, 2.5:0.75, 3.0:0.70}
+# ── Table 5 — Burial depth derating (3-core) — page 20
+DEPTH_DIRECT_MAP  = {0.5:1.00, 0.6:0.99, 0.8:0.96, 1.0:0.94, 1.25:0.92, 1.5:0.91}
+DEPTH_DUCT_MAP    = {0.5:1.00, 0.6:0.99, 0.8:0.97, 1.0:0.96, 1.25:0.94, 1.5:0.93}
 
 RESISTANCE = {
     "cu": {1.5:12.10, 2.5:7.41, 4:4.61, 6:3.08, 10:1.83, 16:1.15,
@@ -290,6 +309,28 @@ RESISTANCE = {
            120:0.253, 150:0.206, 185:0.164, 240:0.125, 300:0.100},
 }
 REACTANCE_DEFAULT = 0.08
+
+# ── Short Circuit k-factors — IEC 60364-5-54 / Elsewedy Table 13
+SC_K = {"cu": {"xlpe": 143, "pvc": 115}, "al": {"xlpe": 94, "pvc": 76}}
+
+# ── Temperature coefficient — IEC 60228
+ALPHA = {"cu": 0.00393, "al": 0.00403}
+
+# ── Insulation max operating temperature
+THETA_OP = {"xlpe": 90, "pvc": 70}
+
+# ── Grouping derating — Table 10 air, by (formation, spacing, num_cables)
+# formation: "trefoil" or "flat" | spacing: "touching","150mm","300mm"
+GROUP_AIR_DETAIL = {
+    ("trefoil", "touching"): {1:1.00,2:0.88,3:0.82,4:0.79,5:0.76,6:0.73},
+    ("trefoil", "150mm"):    {1:1.00,2:0.90,3:0.85,4:0.82,5:0.80,6:0.79},
+    ("trefoil", "300mm"):    {1:1.00,2:0.95,3:0.92,4:0.90,5:0.89,6:0.88},
+    ("flat",    "touching"): {1:1.00,2:0.87,3:0.80,4:0.77,5:0.73,6:0.68},
+    ("flat",    "150mm"):    {1:1.00,2:0.89,3:0.83,4:0.80,5:0.78,6:0.76},
+    ("flat",    "300mm"):    {1:1.00,2:0.93,3:0.90,4:0.88,5:0.87,6:0.86},
+}
+# Table 9 ground — trefoil touching (conservative, standard for buried)
+GROUP_GROUND_DETAIL = {1:1.00,2:0.81,3:0.69,4:0.62,5:0.58,6:0.54}
 
 
 # ─────────────────────────────────────────────
@@ -309,12 +350,17 @@ class CableResult:
     utilisation_pct: float
     voltage_drop_v: float
     voltage_drop_pct: float
+    r_ac_ohm_km: float
     vdrop_ok: bool
+    sc_size_mm2: float
+    sc_governed: bool
     warnings: list
 
 
-def get_temp_derating(insulation, temp_c):
-    table = TEMP_DERATING[insulation]
+def get_temp_derating(insulation, temp_c, installation):
+    """Use Table 3 (air) or Table 4 (ground/duct) per Elsewedy catalog page 19."""
+    tables = TEMP_DERATING_GROUND if installation in ["ground", "duct"] else TEMP_DERATING_AIR
+    table  = tables[insulation]
     if temp_c in table:
         return table[temp_c]
     temps = sorted(table.keys())
@@ -325,34 +371,65 @@ def get_temp_derating(insulation, temp_c):
     return table[temps[-1]]
 
 
+def ac_resistance(conductor, insulation, size_mm2):
+    """
+    AC resistance at operating temperature — IEC 60228 + temperature correction.
+    R_ac = R_dc20 × [1 + α × (θ_op − 20)]
+    Skin & proximity effects negligible for LV multicore.
+    """
+    R_dc20 = RESISTANCE[conductor].get(size_mm2, 0.16)
+    alpha  = ALPHA[conductor]
+    theta  = THETA_OP[insulation]
+    return R_dc20 * (1 + alpha * (theta - 20))
+
+
 def select_cable(load_kw, voltage_v, phases, pf, length_m,
                  temp_c, conductor, insulation, installation,
-                 max_vdrop_pct, num_cables, soil_thermal, burial_depth):
+                 max_vdrop_pct, num_cables, soil_thermal, burial_depth,
+                 formation, spacing, isc_ka, trip_time_s):
 
     warnings = []
     sinpf = math.sqrt(max(0, 1 - pf ** 2))
 
+    # ── Full load current ──────────────────────────────────────
     if phases == 3:
         IFL = (load_kw * 1000) / (math.sqrt(3) * voltage_v * pf)
     else:
         IFL = (load_kw * 1000) / (voltage_v * pf)
 
-    t_derate  = get_temp_derating(insulation, temp_c)
-    g_derate  = GROUP_DERATING.get(num_cables, 0.65)
+    # ── Derating factors ───────────────────────────────────────
+    t_derate  = get_temp_derating(insulation, temp_c, installation)
+
+    # Point 4 — formation-aware grouping derating
+    if installation in ["ground", "duct"]:
+        g_derate = GROUP_GROUND_DETAIL.get(num_cables, 0.54)
+    else:
+        key      = (formation, spacing)
+        g_table  = GROUP_AIR_DETAIL.get(key, GROUP_AIR_DETAIL[("trefoil","touching")])
+        g_derate = g_table.get(num_cables, 0.73)
+
     st_derate = 1.0
     d_derate  = 1.0
-
     if installation in ["ground", "duct"]:
-        st_derate = SOIL_THERMAL_MAP.get(soil_thermal, 1.0)
+        soil_map  = SOIL_THERMAL_DUCT if installation == "duct" else SOIL_THERMAL_DIRECT
+        st_derate = soil_map.get(soil_thermal, 1.0)
         depth_map = DEPTH_DUCT_MAP if installation == "duct" else DEPTH_DIRECT_MAP
         d_derate  = depth_map.get(burial_depth, 1.0)
 
     total_derate = t_derate * g_derate * st_derate * d_derate
     I_required   = IFL / total_derate
 
+    # ── Short circuit minimum size — IEC 60364-5-54 ───────────
+    # Point 5: S_min = (Isc × √t) / k
+    k          = SC_K[conductor][insulation]
+    sc_size_min = (isc_ka * 1000 * math.sqrt(trip_time_s)) / k
+    # round up to next standard size
+    std_sizes  = [c["s"] for c in CATALOG[conductor][insulation][installation]]
+    sc_size_mm2 = next((s for s in std_sizes if s >= sc_size_min), std_sizes[-1])
+
+    # ── Select from catalog by ampacity ───────────────────────
     table  = CATALOG[conductor][insulation][installation]
     chosen = next((c for c in table if c["Iz"] >= I_required), None)
-
     if chosen is None:
         chosen = table[-1]
         warnings.append(
@@ -360,11 +437,13 @@ def select_cable(load_kw, voltage_v, phases, pf, length_m,
             f"({table[-1]['Iz']} A). Consider parallel cables."
         )
 
+    # ── Voltage drop using AC resistance at operating temp ────
+    # Point 1: use R_ac not R_dc20
     def vdrop(size):
-        R   = RESISTANCE[conductor].get(size, 0.16)
-        L   = length_m / 1000
-        imp = R * pf + REACTANCE_DEFAULT * sinpf
-        vd  = (math.sqrt(3) if phases == 3 else 2) * IFL * imp * L
+        R_ac = ac_resistance(conductor, insulation, size)
+        L    = length_m / 1000
+        imp  = R_ac * pf + REACTANCE_DEFAULT * sinpf
+        vd   = (math.sqrt(3) if phases == 3 else 2) * IFL * imp * L
         return vd, (vd / voltage_v) * 100
 
     vd_v, vd_pct = vdrop(chosen["s"])
@@ -383,10 +462,32 @@ def select_cable(load_kw, voltage_v, phases, pf, length_m,
                 "Consider splitting the circuit or reducing cable length."
             )
 
-    eff_cap = chosen["Iz"] * total_derate
-    util    = (IFL / eff_cap * 100) if eff_cap > 0 else 0
+    # ── Apply SC minimum — upsize if needed ───────────────────
+    sc_governed = False
+    if sc_size_mm2 > chosen["s"]:
+        sc_governed = True
+        sc_cable = next((c for c in table if c["s"] >= sc_size_mm2), table[-1])
+        warnings.append(
+            f"Cable upsized from {chosen['s']} mm² to {sc_cable['s']} mm² "
+            f"due to short circuit requirement "
+            f"(Isc={isc_ka} kA, t={trip_time_s}s → min {sc_size_min:.1f} mm²)."
+        )
+        chosen = sc_cable
+        vd_v, vd_pct = vdrop(chosen["s"])
+
+    # ── Final values ───────────────────────────────────────────
+    eff_cap  = chosen["Iz"] * total_derate
+    util     = (IFL / eff_cap * 100) if eff_cap > 0 else 0
+    r_ac_fin = ac_resistance(conductor, insulation, chosen["s"])
+
     if util > 100:
         warnings.append(f"Cable utilisation {util:.1f}% exceeds rated capacity.")
+
+    # Point 2 — cumulative VD note (always shown in results)
+    warnings.append(
+        f"NOTE: This VD ({vd_pct:.2f}%) covers this cable only. "
+        "Ensure total VD from source to load does not exceed 5% (IEC 60364)."
+    )
 
     return CableResult(
         size_mm2=chosen["s"],
@@ -400,7 +501,10 @@ def select_cable(load_kw, voltage_v, phases, pf, length_m,
         utilisation_pct=round(util, 1),
         voltage_drop_v=round(vd_v, 3),
         voltage_drop_pct=round(vd_pct, 3),
+        r_ac_ohm_km=round(r_ac_fin, 4),
         vdrop_ok=vd_pct <= max_vdrop_pct,
+        sc_size_mm2=round(sc_size_min, 1),
+        sc_governed=sc_governed,
         warnings=warnings,
     )
 
@@ -468,7 +572,7 @@ with tab1:
         with sc1:
             soil_thermal = st.selectbox(
                 "Soil Thermal Resistivity (K.m/W)",
-                options=list(SOIL_THERMAL_MAP.keys()), index=2,
+                options=list(SOIL_THERMAL_DIRECT.keys()), index=2,
                 help="Wet soil ≈ 0.8 | Normal ≈ 1.2 | Dry sandy ≈ 2.5")
         with sc2:
             burial_depth = st.selectbox(
@@ -476,18 +580,44 @@ with tab1:
                 options=list(DEPTH_DIRECT_MAP.keys()), index=2)
 
     st.markdown("---")
-    col3, col4 = st.columns(2)
-    with col3:
+    st.markdown("**Grouping & Protection**")
+    gc1, gc2, gc3 = st.columns(3)
+    with gc1:
         max_vdrop  = st.selectbox("Max Voltage Drop (%)", [3.0, 5.0], index=1)
-    with col4:
-        num_cables = st.selectbox("Number of Cables (grouping)", [1,2,3,4,5,6], index=0)
+    with gc2:
+        num_cables = st.selectbox("Number of cables (grouping)", [1,2,3,4,5,6], index=0)
+    with gc3:
+        formation  = st.selectbox("Cable formation",
+                                   ["trefoil", "flat"],
+                                   format_func=lambda x: "Trefoil" if x=="trefoil" else "Flat",
+                                   disabled=(num_cables == 1))
+
+    spacing = "touching"
+    if num_cables > 1 and installation == "air":
+        spacing = st.selectbox("Cable spacing",
+                                ["touching", "150mm", "300mm"],
+                                format_func=lambda x: {"touching":"Touching","150mm":"Spaced 150 mm","300mm":"Spaced 300 mm"}[x])
+
+    st.markdown("---")
+    st.markdown("**Short Circuit Data**")
+    sc1, sc2 = st.columns(2)
+    with sc1:
+        isc_ka      = st.number_input("Fault level at cable origin (kA)",
+                                       min_value=0.1, value=10.0, step=0.5,
+                                       help="Short circuit current at the source end of this cable")
+    with sc2:
+        trip_time_s = st.selectbox("Protection trip time (s)",
+                                    [0.1, 0.2, 0.4, 0.5, 1.0, 2.0, 3.0],
+                                    index=0,
+                                    help="Clearing time of upstream breaker or fuse")
 
     if st.button("⚡ Calculate Cable Size", use_container_width=True):
         try:
             res = select_cable(
                 load_kw, voltage_v, phases, pf, length_m,
                 temp_c, conductor, insulation, installation,
-                max_vdrop, num_cables, soil_thermal, burial_depth
+                max_vdrop, num_cables, soil_thermal, burial_depth,
+                formation, spacing, isc_ka, trip_time_s
             )
 
             st.markdown("---")
@@ -505,15 +635,26 @@ with tab1:
                          f"Limit {max_vdrop}% — {'✓ OK' if res.vdrop_ok else '✗ FAIL'}")
 
             show_soil = installation in ["ground", "duct"]
+
+            # ── SC badge
+            sc_label = f"SC min = {res.sc_size_mm2} mm²"
+            if res.sc_governed:
+                st.error(f"⚡ Cable upsized by Short Circuit requirement — {sc_label}")
+            else:
+                st.info(f"✓ Short circuit check passed — {sc_label}  (selected {res.size_mm2} mm² ≥ required)")
+
             st.markdown("**Calculation Details**")
             details = {
-                "Temp derating factor":     f"× {res.temp_derating}  (at {temp_c}°C)",
-                "Group derating factor":    f"× {res.group_derating}  ({num_cables} cable(s))",
-                "Soil thermal derating":    f"× {res.soil_thermal_derating}" if show_soil else "N/A",
-                "Burial depth derating":    f"× {res.depth_derating}" if show_soil else "N/A",
+                "Full load current":        f"{res.full_load_current} A",
+                "AC resistance at op. temp":f"{res.r_ac_ohm_km} Ω/km  (used for VD calc — IEC 60228)",
+                "Temp derating factor":     f"× {res.temp_derating}  (at {temp_c}°C — Table {'4' if show_soil else '3'})",
+                "Group derating factor":    f"× {res.group_derating}  ({num_cables} cable(s), {formation}, {spacing})",
+                "Soil thermal derating":    f"× {res.soil_thermal_derating}  (Table 6)" if show_soil else "N/A",
+                "Burial depth derating":    f"× {res.depth_derating}  (Table 5)" if show_soil else "N/A",
                 "Effective cable capacity": f"{res.effective_capacity} A",
                 "Cable utilisation":        f"{res.utilisation_pct}%",
                 "Voltage drop":             f"{res.voltage_drop_v} V  ({res.voltage_drop_pct}%)",
+                "SC withstand (min size)":  f"{res.sc_size_mm2} mm²  (Isc={isc_ka} kA, t={trip_time_s}s, k={SC_K[conductor][insulation]})",
                 "Catalog reference":        "3-core multicore — IEC 60502 / IEC 60287",
             }
             for k, v in details.items():
@@ -521,11 +662,18 @@ with tab1:
                 c1.markdown(f"<span style='color:#666'>{k}</span>", unsafe_allow_html=True)
                 c2.markdown(f"**{v}**")
 
-            if res.warnings:
-                for w in res.warnings:
+            # separate notes from real warnings
+            notes    = [w for w in res.warnings if w.startswith("NOTE:")]
+            warnings_only = [w for w in res.warnings if not w.startswith("NOTE:")]
+
+            if warnings_only:
+                for w in warnings_only:
                     st.warning(f"⚠ {w}")
             else:
                 st.success("✓ Cable selection is within all limits.")
+
+            for n in notes:
+                st.info(f"ℹ {n}")
 
         except Exception as e:
             st.error(f"Calculation error: {e}")
