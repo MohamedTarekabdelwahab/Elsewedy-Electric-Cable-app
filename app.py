@@ -339,7 +339,7 @@ with tab1:
     # New Section for Soil and Burial Depth
     if installation in ["ground", "duct"]:
         st.markdown("---")
-        st.markdown("**Soil & Burial Conditions (Elsewedy LV Standard)**")
+        st.markdown("**Soil & Burial Conditions **")
         sc1, sc2 = st.columns(2)
         with sc1:
             soil_thermal = st.selectbox("Soil Thermal Resistivity (K.m/W)", options=list(SOIL_THERMAL_MAP.keys()), index=1)
