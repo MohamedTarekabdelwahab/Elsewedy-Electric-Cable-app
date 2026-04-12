@@ -319,7 +319,7 @@ with st.sidebar:
 # 7. Main UI — Tabs
 # ─────────────────────────────────────────────
 display_logo(200)
-st.title("⚡ Elsewedy Electric Smart Tool")
+st.title(" Elsewedy Electric Smart Tool")
 st.markdown("---")
 
 tab1, tab2 = st.tabs(["🔌 Cable Size Calculator", " Technical Support"])
