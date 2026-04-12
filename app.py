@@ -535,7 +535,7 @@ st.markdown("---")
 tab1, tab2 = st.tabs(["🔌 Cable Size Calculator", "🤖 Technical Support"])
 
 with tab1:
-    st.subheader("Cable Size Selection — Elsewedy Catalog (IEC 60287 / IEC 60502)")
+    st.subheader("Cable Size Selection — Elsewedy Catalog (IEC 60502)")
 
     col1, col2 = st.columns(2)
     with col1:
