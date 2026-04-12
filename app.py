@@ -32,7 +32,7 @@ st.markdown("""
 # ─────────────────────────────────────────────
 # 1. Page config — MUST be first Streamlit call
 # ─────────────────────────────────────────────
-st.set_page_config(page_title="Elsewedy Smart Tool", layout="wide", page_icon="")
+st.set_page_config(page_title="Elsewedy Smart Tool", layout="wide")
 
 # ─────────────────────────────────────────────
 # 2. API Key setup
