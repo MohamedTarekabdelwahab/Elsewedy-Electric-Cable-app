@@ -219,7 +219,81 @@ class CableResult:
     voltage_drop_pct: float
     vdrop_ok: bool
     warnings: list
+import streamlit as st
 
+# عنوان القسم في التطبيق
+st.header("Cable Selection Derating Factors (LV Standard)")
+
+# إنشاء حاوية منظمة للمدخلات الجديدة
+with st.expander("Soil & Installation Conditions (Elsewedy LV Standards)", expanded=True):
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        # 1. معامل المقاومة الحرارية للتربة (Soil Thermal Resistivity)
+        # القيم المرجعية لجهد LV: 1.2 K.m/W
+        thermal_map_lv = {
+            "1.0 K.m/W (Very Moist)": 1.05,
+            "1.2 K.m/W (Standard)": 1.00,
+            "1.5 K.m/W (Damp)": 0.92,
+            "2.0 K.m/W (Dry)": 0.83,
+            "2.5 K.m/W (Very Dry)": 0.76,
+            "3.0 K.m/W (Rocky)": 0.71
+        }
+        selected_thermal = st.selectbox(
+            "Soil Thermal Resistivity:", 
+            options=list(thermal_map_lv.keys()), 
+            index=1
+        )
+        derating_soil_thermal = thermal_map_lv[selected_thermal]
+
+    with col2:
+        # 2. معامل عمق الدفن (Depth of Laying)
+        # القيم المرجعية لجهد LV: 0.80 m
+        # ملاحظة: تم دمج شرط الـ Duct هنا لضمان الدقة
+        
+        # افترضنا أن متغير installation_method موجود في كودك الأصلي
+        # إذا لم يكن موجوداً، يمكنك تعريفه أو تركه كـ "Directly Buried"
+        is_duct = st.checkbox("Installed in Duct?") 
+        
+        if is_duct:
+            depth_map_lv = {
+                "0.50 m": 1.00, "0.60 m": 0.99, "0.80 m (Std)": 0.98,
+                "1.00 m": 0.96, "1.25 m": 0.95, "1.50 m": 0.94
+            }
+        else:
+            depth_map_lv = {
+                "0.50 m": 1.03, "0.60 m": 1.02, "0.80 m (Std)": 1.00,
+                "1.00 m": 0.98, "1.25 m": 0.96, "1.50 m": 0.95
+            }
+            
+        selected_depth = st.selectbox(
+            "Depth of Laying:", 
+            options=list(depth_map_lv.keys()), 
+            index=2
+        )
+        derating_depth = depth_map_lv[selected_depth]
+
+# --- الجزء الخاص بالحسابات النهائية ---
+
+# تأكد من دمج المتغيرات الجديدة مع المتغيرات القديمة في كودك
+# افترضنا أن derating_temp و derating_grouping موجودين مسبقاً
+
+# 1. حساب المعامل الإجمالي الجديد
+total_soil_factor = derating_soil_thermal * derating_depth
+
+# 2. حساب المعامل الكلي للتطبيق (Total Derating Factor)
+# تأكد من تعريف derating_temp و derating_grouping قبل هذه الخطوة
+# total_df = derating_temp * derating_grouping * total_soil_factor
+
+st.divider()
+st.subheader("Results Summary")
+res_col1, res_col2, res_col3 = st.columns(3)
+
+res_col1.metric("Soil Thermal Factor", f"{derating_soil_thermal}")
+res_col2.metric("Depth Factor", f"{derating_depth}")
+res_col3.metric("Combined Soil Factor", f"{total_soil_factor:.2f}")
+
+st.info("Note: These factors are applied to the base current rating from Elsewedy LV catalogs.")
 
 def get_temp_derating(insulation, temp_c):
     table = TEMP_DERATING[insulation]
