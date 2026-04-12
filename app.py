@@ -84,7 +84,7 @@ def display_logo(w):
     if os.path.exists("logo.png"):
         st.image("logo.png", width=w)
     else:
-        st.markdown(f"### ⚡ Elsewedy Electric")
+        st.markdown(f"###  Elsewedy Electric")
 
 # ─────────────────────────────────────────────
 # 5. Cable Selection — Catalog & Logic
