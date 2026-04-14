@@ -742,7 +742,7 @@ st.markdown("---")
 tab1, tab2 = st.tabs(["🔌 Cable Size Calculator", "🤖 Technical Support"])
 
 with tab1:
-    st.subheader("Cable Size Selection — Elsewedy Catalog (IEC 60287 / IEC 60502)")
+    st.subheader("Cable Size Selection — Elsewedy Catalog ( IEC 60502)")
 
     # ── Cable type selector ───────────────────────────────────────────────
     cable_type = st.radio(
