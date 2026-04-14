@@ -541,7 +541,7 @@ with tab1:
     with col1:
         st.markdown("**Load Data**")
         load_kw   = st.number_input("Load (kW)", min_value=0.1, value=50.0, step=0.5)
-        voltage_v = st.selectbox("System Voltage", [230, 400], index=1)
+        voltage_v = st.selectbox("System Voltage", [220, 230, 380, 400], index=2)
         neutral   = st.radio("Neutral conductor required?", [True, False],
                              format_func=lambda x: "Yes — 4-core" if x else "No — 3-core",
                              horizontal=True,
