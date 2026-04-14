@@ -631,11 +631,11 @@ def select_single_core(load_kw, voltage_v, phases, pf, length_m,
     I_required   = IFL / total_derate
 
     # Catalog lookup — single core only has cu/xlpe and al/xlpe
-    if conductor == "al" and insulation == "pvc":
-        warnings.append("Al/PVC single core not standard in Elsewedy catalog — using Al/XLPE values.")
-        insulation = "xlpe"
-    if conductor == "cu" and insulation == "pvc":
-        warnings.append("Cu/PVC single core — using Cu/XLPE values (PVC single core not in LV catalog).")
+    if insulation == "pvc":
+        warnings.append(
+            "PVC single core is not standard in the Elsewedy LV catalog. "
+            "XLPE values have been used instead."
+        )
         insulation = "xlpe"
 
     table  = SC_CATALOG[conductor]["xlpe"][installation]
