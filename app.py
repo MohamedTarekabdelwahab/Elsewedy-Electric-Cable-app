@@ -529,19 +529,23 @@ with st.sidebar:
 # 8. Main UI
 # ─────────────────────────────────────────────
 display_logo(200)
-st.title(" Elsewedy Electric Smart Tool")
+st.title("⚡ Elsewedy Electric Smart Tool")
 st.markdown("---")
 
 tab1, tab2 = st.tabs(["🔌 Cable Size Calculator", "🤖 Technical Support"])
 
 with tab1:
-    st.subheader("Cable Size Selection — Elsewedy Catalog (IEC 60502)")
+    st.subheader("Cable Size Selection — Elsewedy Catalog (IEC 60287 / IEC 60502)")
 
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("**Load Data**")
         load_kw   = st.number_input("Load (kW)", min_value=0.1, value=50.0, step=0.5)
-        voltage_v = st.selectbox("System Voltage", [220, 380], index=1)
+        voltage_v = st.selectbox("System Voltage", [230, 400], index=1)
+        neutral   = st.radio("Neutral conductor required?", [True, False],
+                             format_func=lambda x: "Yes — 4-core" if x else "No — 3-core",
+                             horizontal=True,
+                             help="4-core = same Iz as 3-core. Selection only affects the cable label.")
         phases    = st.radio("System Type", [3, 1],
                              format_func=lambda x: "Three Phase (3Ø)" if x == 3 else "Single Phase (1Ø)")
         pf        = st.slider("Power Factor (cosφ)", 0.5, 1.0, 0.85, 0.01)
@@ -627,8 +631,9 @@ with tab1:
             ins_label  = insulation.upper()
 
             col_a, col_b, col_c = st.columns(3)
+            cores_label = "4-core" if neutral else "3-core"
             col_a.metric("Recommended Size",  f"{res.size_mm2} mm²",
-                         f"{cond_label} / {ins_label} / 3-core")
+                         f"{cond_label} / {ins_label} / {cores_label}")
             col_b.metric("Full Load Current", f"{res.full_load_current} A",
                          f"Iz catalog = {res.catalog_iz} A")
             col_c.metric("Voltage Drop",      f"{res.voltage_drop_pct}%",
@@ -655,15 +660,16 @@ with tab1:
                 "Cable utilisation":        f"{res.utilisation_pct}%",
                 "Voltage drop":             f"{res.voltage_drop_v} V  ({res.voltage_drop_pct}%)",
                 "SC withstand (min size)":  f"{res.sc_size_mm2} mm²  (Isc={isc_ka} kA, t={trip_time_s}s, k={SC_K[conductor][insulation]})",
-                "Catalog reference":        "3-core multicore — IEC 60502 / IEC 60287",
+                "Cable designation":         f"{res.size_mm2} mm²  {cond_label}/{ins_label}/{cores_label}  0.6/1 kV",
+                "Catalog reference":         f"{cores_label} multicore — IEC 60502 / IEC 60287",
             }
             for k, v in details.items():
                 c1, c2 = st.columns([2, 3])
                 c1.markdown(f"<span style='color:#666'>{k}</span>", unsafe_allow_html=True)
                 c2.markdown(f"**{v}**")
 
-            # separate notes from real warnings
-            notes    = [w for w in res.warnings if w.startswith("NOTE:")]
+            # ── Separate notes from real warnings ─────────────────────────
+            notes         = [w for w in res.warnings if w.startswith("NOTE:")]
             warnings_only = [w for w in res.warnings if not w.startswith("NOTE:")]
 
             if warnings_only:
@@ -674,6 +680,25 @@ with tab1:
 
             for n in notes:
                 st.info(f"ℹ {n}")
+
+            # ── Smart warnings for large sections ─────────────────────────
+            if res.size_mm2 >= 185:
+                st.warning(
+                    f"⚠ Large section selected ({res.size_mm2} mm²). Consider the following:\n\n"
+                    f"**Option A — Parallel multicore:** Run 2× {int(res.size_mm2/2)} mm² cables "
+                    f"(easier to handle, terminate and replace).\n\n"
+                    f"**Option B — Single core:** Higher Iz per cable but requires careful "
+                    f"formation control (trefoil mandatory above 95 mm²). "
+                    f"Verify against Elsewedy single-core tables — "
+                    f"{'page 82–83' if insulation=='xlpe' else 'page 78–79'} in the catalog."
+                )
+            elif res.size_mm2 >= 95:
+                st.info(
+                    f"ℹ Section {res.size_mm2} mm² — single-core cables are available as an "
+                    f"alternative if installation space is a constraint. "
+                    f"Iz for single-core {res.size_mm2} mm² {ins_label} in air (trefoil) is higher "
+                    f"than multicore — see Elsewedy catalog for comparison."
+                )
 
         except Exception as e:
             st.error(f"Calculation error: {e}")
