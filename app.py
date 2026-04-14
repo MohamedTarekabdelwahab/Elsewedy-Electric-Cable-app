@@ -54,7 +54,7 @@ def display_logo(w):
     if os.path.exists("logo.png"):
         st.image("logo.png", width=w)
     else:
-        st.markdown("### ⚡ Elsewedy Electric")
+        st.markdown("###  Elsewedy Electric")
 
 # ─────────────────────────────────────────────
 # 4. CATALOG — Verified from Elsewedy PDF
@@ -736,7 +736,7 @@ with st.sidebar:
 # 8. Main UI
 # ─────────────────────────────────────────────
 display_logo(200)
-st.title("⚡ Elsewedy Electric Smart Tool")
+st.title(" Elsewedy Electric Smart Tool")
 st.markdown("---")
 
 tab1, tab2 = st.tabs(["🔌 Cable Size Calculator", "🤖 Technical Support"])
@@ -757,7 +757,7 @@ with tab1:
     with col1:
         st.markdown("**Load Data**")
         load_kw   = st.number_input("Load (kW)", min_value=0.1, value=50.0, step=0.5)
-        voltage_v = st.selectbox("System Voltage", [230, 400], index=1)
+        voltage_v = st.selectbox("System Voltage", [220, 230, 380, 400], index=1)
         if cable_type == "multicore":
             neutral = st.radio("Neutral conductor required?", [True, False],
                                format_func=lambda x: "Yes — 4-core" if x else "No — 3-core",
@@ -840,7 +840,7 @@ with tab1:
                                     index=0,
                                     help="Clearing time of upstream breaker or fuse")
 
-    if st.button("⚡ Calculate Cable Size", use_container_width=True):
+    if st.button(" Calculate Cable Size", use_container_width=True):
         try:
             if cable_type == "single_core":
                 res = select_single_core(
@@ -883,7 +883,7 @@ with tab1:
             # ── SC badge
             sc_label = f"SC min = {res.sc_size_mm2} mm²"
             if res.sc_governed:
-                st.error(f"⚡ Cable upsized by Short Circuit requirement — {sc_label}")
+                st.error(f" Cable upsized by Short Circuit requirement — {sc_label}")
             else:
                 st.info(f"✓ Short circuit check passed — {sc_label}  (selected {res.size_mm2} mm² ≥ required)")
 
