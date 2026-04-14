@@ -310,6 +310,85 @@ RESISTANCE = {
 }
 REACTANCE_DEFAULT = 0.08
 
+# ─────────────────────────────────────────────
+# SINGLE CORE CATALOG — Elsewedy LV 0.6/1 kV
+# Cu/XLPE unarmoured → page 82
+# Al/XLPE ATA armoured → page 85
+# Columns: ground (Trefoil) | duct | air (Trefoil Touched)
+# ─────────────────────────────────────────────
+SC_CATALOG = {
+    "cu": {
+        "xlpe": {
+            "ground": [
+                {"s":4,"Iz":60},{"s":6,"Iz":77},{"s":10,"Iz":105},
+                {"s":16,"Iz":131},{"s":25,"Iz":168},{"s":35,"Iz":201},
+                {"s":50,"Iz":239},{"s":70,"Iz":292},{"s":95,"Iz":349},
+                {"s":120,"Iz":397},{"s":150,"Iz":445},{"s":185,"Iz":503},
+                {"s":240,"Iz":583},{"s":300,"Iz":658},{"s":400,"Iz":744},
+                {"s":500,"Iz":840},{"s":630,"Iz":942},{"s":800,"Iz":1042},
+                {"s":1000,"Iz":1142},
+            ],
+            "duct": [
+                {"s":4,"Iz":42},{"s":6,"Iz":56},{"s":10,"Iz":72},
+                {"s":16,"Iz":92},{"s":25,"Iz":118},{"s":35,"Iz":143},
+                {"s":50,"Iz":172},{"s":70,"Iz":214},{"s":95,"Iz":259},
+                {"s":120,"Iz":298},{"s":150,"Iz":339},{"s":185,"Iz":390},
+                {"s":240,"Iz":457},{"s":300,"Iz":524},{"s":400,"Iz":603},
+                {"s":500,"Iz":695},{"s":630,"Iz":794},{"s":800,"Iz":894},
+                {"s":1000,"Iz":999},
+            ],
+            "air": [
+                {"s":4,"Iz":44},{"s":6,"Iz":59},{"s":10,"Iz":75},
+                {"s":16,"Iz":105},{"s":25,"Iz":138},{"s":35,"Iz":166},
+                {"s":50,"Iz":210},{"s":70,"Iz":268},{"s":95,"Iz":321},
+                {"s":120,"Iz":375},{"s":150,"Iz":446},{"s":185,"Iz":519},
+                {"s":240,"Iz":622},{"s":300,"Iz":722},{"s":400,"Iz":842},
+                {"s":500,"Iz":981},{"s":630,"Iz":1132},{"s":800,"Iz":1291},
+                {"s":1000,"Iz":1473},
+            ],
+        },
+    },
+    "al": {
+        "xlpe": {
+            "ground": [
+                {"s":16,"Iz":103},{"s":25,"Iz":132},{"s":35,"Iz":158},
+                {"s":50,"Iz":187},{"s":70,"Iz":228},{"s":95,"Iz":273},
+                {"s":120,"Iz":310},{"s":150,"Iz":347},{"s":185,"Iz":394},
+                {"s":240,"Iz":456},{"s":300,"Iz":515},{"s":400,"Iz":588},
+                {"s":500,"Iz":670},{"s":630,"Iz":759},{"s":800,"Iz":852},
+                {"s":1000,"Iz":944},
+            ],
+            "duct": [
+                {"s":16,"Iz":76},{"s":25,"Iz":98},{"s":35,"Iz":117},
+                {"s":50,"Iz":140},{"s":70,"Iz":174},{"s":95,"Iz":209},
+                {"s":120,"Iz":240},{"s":150,"Iz":273},{"s":185,"Iz":313},
+                {"s":240,"Iz":368},{"s":300,"Iz":419},{"s":400,"Iz":488},
+                {"s":500,"Iz":563},{"s":630,"Iz":648},{"s":800,"Iz":743},
+                {"s":1000,"Iz":838},
+            ],
+            "air": [
+                {"s":16,"Iz":90},{"s":25,"Iz":120},{"s":35,"Iz":146},
+                {"s":50,"Iz":177},{"s":70,"Iz":223},{"s":95,"Iz":272},
+                {"s":120,"Iz":316},{"s":150,"Iz":362},{"s":185,"Iz":419},
+                {"s":240,"Iz":498},{"s":300,"Iz":577},{"s":400,"Iz":675},
+                {"s":500,"Iz":788},{"s":630,"Iz":913},{"s":800,"Iz":1052},
+                {"s":1000,"Iz":1200},
+            ],
+        },
+    },
+}
+
+# Extended resistance for large single core sizes (IEC 60228)
+RESISTANCE_SC = {
+    "cu": {**{1.5:12.10,2.5:7.41,4:4.61,6:3.08,10:1.83,16:1.15,
+              25:0.727,35:0.524,50:0.387,70:0.268,95:0.193,120:0.153,
+              150:0.124,185:0.0991,240:0.0754,300:0.0601},
+           400:0.0470,500:0.0366,630:0.0283,800:0.0221,1000:0.0176},
+    "al": {**{16:1.91,25:1.20,35:0.868,50:0.641,70:0.443,95:0.320,
+              120:0.253,150:0.206,185:0.164,240:0.125,300:0.100},
+           400:0.0778,500:0.0605,630:0.0469,800:0.0367,1000:0.0291},
+}
+
 # ── Short Circuit k-factors — IEC 60364-5-54 / Elsewedy Table 13
 SC_K = {"cu": {"xlpe": 143, "pvc": 115}, "al": {"xlpe": 94, "pvc": 76}}
 
@@ -509,6 +588,140 @@ def select_cable(load_kw, voltage_v, phases, pf, length_m,
     )
 
 
+
+def select_single_core(load_kw, voltage_v, phases, pf, length_m,
+                       temp_c, conductor, insulation, installation,
+                       max_vdrop_pct, num_cables,
+                       soil_thermal, burial_depth,
+                       isc_ka, trip_time_s):
+    """
+    Single core cable selection.
+    Iz values: ground=trefoil, duct=duct, air=trefoil touched.
+    Grouping derating: Table 8 (single core in ground) or Table 10 (air).
+    """
+    warnings = []
+    sinpf = math.sqrt(max(0, 1 - pf**2))
+
+    # Full load current
+    if phases == 3:
+        IFL = (load_kw * 1000) / (math.sqrt(3) * voltage_v * pf)
+    else:
+        IFL = (load_kw * 1000) / (voltage_v * pf)
+
+    # Temperature derating — same tables as multicore
+    t_derate = get_temp_derating(insulation, temp_c, installation)
+
+    # Grouping — Table 8 for single core in ground (trefoil touching)
+    # Table 10 for single core in air (same as multicore touching)
+    TABLE8_GROUND = {1:1.00,2:0.87,3:0.76,4:0.72,5:0.67,6:0.64}
+    TABLE10_AIR   = {1:1.00,2:0.88,3:0.82,4:0.79,5:0.76,6:0.73}
+    g_table = TABLE10_AIR if installation == "air" else TABLE8_GROUND
+    g_derate = g_table.get(num_cables, 0.60)
+
+    # Soil & depth derating — same as multicore
+    st_derate = 1.0
+    d_derate  = 1.0
+    if installation in ["ground", "duct"]:
+        soil_map  = SOIL_THERMAL_DUCT if installation == "duct" else SOIL_THERMAL_DIRECT
+        st_derate = soil_map.get(soil_thermal, 1.0)
+        depth_map = DEPTH_DUCT_MAP if installation == "duct" else DEPTH_DIRECT_MAP
+        d_derate  = depth_map.get(burial_depth, 1.0)
+
+    total_derate = t_derate * g_derate * st_derate * d_derate
+    I_required   = IFL / total_derate
+
+    # Catalog lookup — single core only has cu/xlpe and al/xlpe
+    if conductor == "al" and insulation == "pvc":
+        warnings.append("Al/PVC single core not standard in Elsewedy catalog — using Al/XLPE values.")
+        insulation = "xlpe"
+    if conductor == "cu" and insulation == "pvc":
+        warnings.append("Cu/PVC single core — using Cu/XLPE values (PVC single core not in LV catalog).")
+        insulation = "xlpe"
+
+    table  = SC_CATALOG[conductor]["xlpe"][installation]
+    chosen = next((c for c in table if c["Iz"] >= I_required), None)
+    if chosen is None:
+        chosen = table[-1]
+        warnings.append(
+            f"Load ({I_required:.1f} A) exceeds max catalog size "
+            f"({table[-1]['s']} mm² = {table[-1]['Iz']} A). Consider parallel single cores."
+        )
+
+    # AC resistance at operating temp
+    R_dc = RESISTANCE_SC[conductor].get(chosen["s"], 0.05)
+    alpha = ALPHA[conductor]
+    theta = THETA_OP["xlpe"]  # single core in catalog is always XLPE
+    R_ac  = R_dc * (1 + alpha * (theta - 20))
+
+    # Voltage drop
+    def vdrop(R):
+        L   = length_m / 1000
+        imp = R * pf + REACTANCE_DEFAULT * sinpf
+        vd  = (math.sqrt(3) if phases == 3 else 2) * IFL * imp * L
+        return vd, (vd / voltage_v) * 100
+
+    vd_v, vd_pct = vdrop(R_ac)
+
+    if vd_pct > max_vdrop_pct:
+        for cable in table:
+            if cable["Iz"] >= I_required:
+                R2 = RESISTANCE_SC[conductor].get(cable["s"], 0.05)
+                R2_ac = R2 * (1 + alpha * (theta - 20))
+                _, cand_pct = vdrop(R2_ac)
+                if cand_pct <= max_vdrop_pct:
+                    chosen = cable
+                    R_ac   = R2_ac
+                    break
+        vd_v, vd_pct = vdrop(R_ac)
+        if vd_pct > max_vdrop_pct:
+            warnings.append(
+                f"Voltage drop ({vd_pct:.2f}%) still exceeds {max_vdrop_pct}%. "
+                "Consider parallel cables or reducing length."
+            )
+
+    # Short circuit check
+    k = SC_K[conductor]["xlpe"]
+    sc_size_min = (isc_ka * 1000 * math.sqrt(trip_time_s)) / k
+    sc_governed = False
+    if sc_size_min > chosen["s"]:
+        sc_governed = True
+        sc_cable = next((c for c in table if c["s"] >= sc_size_min), table[-1])
+        warnings.append(
+            f"Cable upsized from {chosen['s']} mm² to {sc_cable['s']} mm² "
+            f"due to SC requirement (min {sc_size_min:.1f} mm²)."
+        )
+        chosen = sc_cable
+        R_ac   = RESISTANCE_SC[conductor].get(chosen["s"], 0.05) * (1 + alpha * (theta - 20))
+        vd_v, vd_pct = vdrop(R_ac)
+
+    eff_cap = chosen["Iz"] * total_derate
+    util    = (IFL / eff_cap * 100) if eff_cap > 0 else 0
+
+    warnings.append(
+        f"NOTE: This VD ({vd_pct:.2f}%) covers this cable only. "
+        "Ensure total VD from source to load does not exceed 5% (IEC 60364)."
+    )
+
+    return CableResult(
+        size_mm2=chosen["s"],
+        catalog_iz=chosen["Iz"],
+        full_load_current=round(IFL, 2),
+        temp_derating=round(t_derate, 3),
+        group_derating=round(g_derate, 3),
+        soil_thermal_derating=round(st_derate, 3),
+        depth_derating=round(d_derate, 3),
+        effective_capacity=round(eff_cap, 2),
+        utilisation_pct=round(util, 1),
+        voltage_drop_v=round(vd_v, 3),
+        voltage_drop_pct=round(vd_pct, 3),
+        r_ac_ohm_km=round(R_ac, 4),
+        vdrop_ok=vd_pct <= max_vdrop_pct,
+        sc_size_mm2=round(sc_size_min, 1),
+        sc_governed=sc_governed,
+        warnings=warnings,
+    )
+
+
 # ─────────────────────────────────────────────
 # 7. Sidebar
 # ─────────────────────────────────────────────
@@ -537,11 +750,20 @@ tab1, tab2 = st.tabs(["🔌 Cable Size Calculator", "🤖 Technical Support"])
 with tab1:
     st.subheader("Cable Size Selection — Elsewedy Catalog (IEC 60287 / IEC 60502)")
 
+    # ── Cable type selector ───────────────────────────────────────────────
+    cable_type = st.radio(
+        "Cable type",
+        ["multicore", "single_core"],
+        format_func=lambda x: "Multicore (3-core / 4-core)" if x=="multicore" else "Single Core (1×mm²)",
+        horizontal=True,
+    )
+    st.markdown("---")
+
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("**Load Data**")
         load_kw   = st.number_input("Load (kW)", min_value=0.1, value=50.0, step=0.5)
-        voltage_v = st.selectbox("System Voltage", [220, 230, 380, 400], index=2)
+        voltage_v = st.selectbox("System Voltage", [230, 400], index=1)
         neutral   = st.radio("Neutral conductor required?", [True, False],
                              format_func=lambda x: "Yes — 4-core" if x else "No — 3-core",
                              horizontal=True,
@@ -617,12 +839,20 @@ with tab1:
 
     if st.button("⚡ Calculate Cable Size", use_container_width=True):
         try:
-            res = select_cable(
-                load_kw, voltage_v, phases, pf, length_m,
-                temp_c, conductor, insulation, installation,
-                max_vdrop, num_cables, soil_thermal, burial_depth,
-                formation, spacing, isc_ka, trip_time_s
-            )
+            if cable_type == "single_core":
+                res = select_single_core(
+                    load_kw, voltage_v, phases, pf, length_m,
+                    temp_c, conductor, insulation, installation,
+                    max_vdrop, num_cables, soil_thermal, burial_depth,
+                    isc_ka, trip_time_s
+                )
+            else:
+                res = select_cable(
+                    load_kw, voltage_v, phases, pf, length_m,
+                    temp_c, conductor, insulation, installation,
+                    max_vdrop, num_cables, soil_thermal, burial_depth,
+                    formation, spacing, isc_ka, trip_time_s
+                )
 
             st.markdown("---")
             st.markdown("### Results")
@@ -631,9 +861,15 @@ with tab1:
             ins_label  = insulation.upper()
 
             col_a, col_b, col_c = st.columns(3)
-            cores_label = "4-core" if neutral else "3-core"
-            col_a.metric("Recommended Size",  f"{res.size_mm2} mm²",
-                         f"{cond_label} / {ins_label} / {cores_label}")
+            if cable_type == "single_core":
+                cores_label = "single core"
+                cable_desig = f"1×{res.size_mm2} mm²  {cond_label}/XLPE"
+            else:
+                cores_label = "4-core" if neutral else "3-core"
+                cable_desig = f"{res.size_mm2} mm²  {cond_label}/{ins_label}/{cores_label}"
+            col_a.metric("Recommended Size",
+                         f"1×{res.size_mm2} mm²" if cable_type=="single_core" else f"{res.size_mm2} mm²",
+                         cable_desig)
             col_b.metric("Full Load Current", f"{res.full_load_current} A",
                          f"Iz catalog = {res.catalog_iz} A")
             col_c.metric("Voltage Drop",      f"{res.voltage_drop_pct}%",
@@ -660,8 +896,8 @@ with tab1:
                 "Cable utilisation":        f"{res.utilisation_pct}%",
                 "Voltage drop":             f"{res.voltage_drop_v} V  ({res.voltage_drop_pct}%)",
                 "SC withstand (min size)":  f"{res.sc_size_mm2} mm²  (Isc={isc_ka} kA, t={trip_time_s}s, k={SC_K[conductor][insulation]})",
-                "Cable designation":         f"{res.size_mm2} mm²  {cond_label}/{ins_label}/{cores_label}  0.6/1 kV",
-                "Catalog reference":         f"{cores_label} multicore — IEC 60502 / IEC 60287",
+                "Cable designation":         cable_desig + "  0.6/1 kV",
+                "Catalog reference":         ("Single core — IEC 60502 p.82/85" if cable_type=="single_core" else f"{cores_label} multicore — IEC 60502 / IEC 60287"),
             }
             for k, v in details.items():
                 c1, c2 = st.columns([2, 3])
