@@ -630,13 +630,7 @@ def select_single_core(load_kw, voltage_v, phases, pf, length_m,
     total_derate = t_derate * g_derate * st_derate * d_derate
     I_required   = IFL / total_derate
 
-    # Catalog lookup — single core only has cu/xlpe and al/xlpe
-    if insulation == "pvc":
-        warnings.append(
-            "PVC single core is not standard in the Elsewedy LV catalog. "
-            "XLPE values have been used instead."
-        )
-        insulation = "xlpe"
+    # Catalog: single core is always XLPE (insulation locked in UI)
 
     table  = SC_CATALOG[conductor]["xlpe"][installation]
     chosen = next((c for c in table if c["Iz"] >= I_required), None)
@@ -764,10 +758,13 @@ with tab1:
         st.markdown("**Load Data**")
         load_kw   = st.number_input("Load (kW)", min_value=0.1, value=50.0, step=0.5)
         voltage_v = st.selectbox("System Voltage", [230, 400], index=1)
-        neutral   = st.radio("Neutral conductor required?", [True, False],
-                             format_func=lambda x: "Yes — 4-core" if x else "No — 3-core",
-                             horizontal=True,
-                             help="4-core = same Iz as 3-core. Selection only affects the cable label.")
+        if cable_type == "multicore":
+            neutral = st.radio("Neutral conductor required?", [True, False],
+                               format_func=lambda x: "Yes — 4-core" if x else "No — 3-core",
+                               horizontal=True,
+                               help="4-core = same Iz as 3-core. Selection only affects the cable label.")
+        else:
+            neutral = False  # single core — neutral is a separate cable if needed
         phases    = st.radio("System Type", [3, 1],
                              format_func=lambda x: "Three Phase (3Ø)" if x == 3 else "Single Phase (1Ø)")
         pf        = st.slider("Power Factor (cosφ)", 0.5, 1.0, 0.85, 0.01)
@@ -780,8 +777,14 @@ with tab1:
                                      help="Saudi default: 40°C")
         conductor    = st.selectbox("Conductor Material", ["cu", "al"],
                                      format_func=lambda x: "Copper (Cu)" if x == "cu" else "Aluminium (Al)")
-        insulation   = st.selectbox("Insulation Type", ["xlpe", "pvc"],
-                                     format_func=lambda x: "XLPE (90°C)" if x == "xlpe" else "PVC (70°C)")
+        if cable_type == "single_core":
+            insulation = "xlpe"
+            st.selectbox("Insulation Type", ["XLPE (90°C)"],
+                         disabled=True,
+                         help="Single core LV cables are XLPE only in the Elsewedy catalog.")
+        else:
+            insulation = st.selectbox("Insulation Type", ["xlpe", "pvc"],
+                                      format_func=lambda x: "XLPE (90°C)" if x == "xlpe" else "PVC (70°C)")
         installation = st.selectbox("Installation Method",
                                      ["air", "ground", "duct"],
                                      format_func=lambda x: {
