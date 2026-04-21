@@ -3,7 +3,6 @@ import google.generativeai as genai
 import math
 import os
 import glob
-import yfinance as yf
 import requests
 from datetime import datetime
 from dataclasses import dataclass
@@ -34,49 +33,48 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────
-# LIVE METAL PRICES
+# LIVE METAL PRICES - Stooq + Fallback
 # ─────────────────────────────────────────────
 USD_TO_SAR = 3.75
 
 
-def fetch_from_yahoo():
+def fetch_from_stooq():
     try:
-        copper = yf.Ticker("HG=F")
-        alum = yf.Ticker("ALI=F")
-        cu_data = copper.history(period="5d")
-        al_data = alum.history(period="5d")
-        if cu_data.empty or al_data.empty:
-            return None
-        cu_now = float(cu_data["Close"].iloc[-1]) * 2204.62
-        cu_prev = float(cu_data["Close"].iloc[-2]) * 2204.62 if len(cu_data) > 1 else cu_now
-        al_now = float(al_data["Close"].iloc[-1])
-        al_prev = float(al_data["Close"].iloc[-2]) if len(al_data) > 1 else al_now
-        return {
-            "copper": {"price": cu_now, "change": ((cu_now - cu_prev) / cu_prev) * 100 if cu_prev else 0},
-            "aluminium": {"price": al_now, "change": ((al_now - al_prev) / al_prev) * 100 if al_prev else 0},
-            "source": "Yahoo Finance (COMEX/CME Futures)",
-            "updated": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         }
-    except Exception:
-        return None
+        cu_url = "https://stooq.com/q/l/?s=hg.f&f=sd2t2ohlcv&h&e=csv"
+        cu_resp = requests.get(cu_url, headers=headers, timeout=10)
+        al_url = "https://stooq.com/q/l/?s=ali.f&f=sd2t2ohlcv&h&e=csv"
+        al_resp = requests.get(al_url, headers=headers, timeout=10)
 
+        if cu_resp.status_code != 200 or al_resp.status_code != 200:
+            return None
 
-def fetch_from_lme_backup():
-    try:
-        url = "https://api.metals.dev/v1/latest?api_key=demo&currency=USD&unit=toz"
-        response = requests.get(url, timeout=5)
-        if response.status_code != 200:
+        cu_lines = cu_resp.text.strip().split('\n')
+        al_lines = al_resp.text.strip().split('\n')
+
+        if len(cu_lines) < 2 or len(al_lines) < 2:
             return None
-        data = response.json()
-        metals = data.get("metals", {})
-        cu_toz = metals.get("copper", 0)
-        al_toz = metals.get("aluminum", 0)
-        if not cu_toz or not al_toz:
+
+        cu_fields = cu_lines[1].split(',')
+        al_fields = al_lines[1].split(',')
+
+        cu_close = float(cu_fields[6])
+        al_close = float(al_fields[6])
+
+        cu_ton = cu_close * 2204.62
+        al_ton = al_close * 2204.62
+
+        if cu_ton < 5000 or cu_ton > 20000:
             return None
+        if al_ton < 1500 or al_ton > 6000:
+            return None
+
         return {
-            "copper": {"price": cu_toz * 32150.7, "change": 0},
-            "aluminium": {"price": al_toz * 32150.7, "change": 0},
-            "source": "Metals-API (LME spot)",
+            "copper": {"price": cu_ton, "change": 0},
+            "aluminium": {"price": al_ton, "change": 0},
+            "source": "Stooq.com (COMEX Futures)",
             "updated": datetime.now().strftime("%Y-%m-%d %H:%M"),
         }
     except Exception:
@@ -85,19 +83,16 @@ def fetch_from_lme_backup():
 
 def get_fallback_prices():
     return {
-        "copper": {"price": 9200, "change": 0},
-        "aluminium": {"price": 2400, "change": 0},
-        "source": "Offline estimates (LME average)",
+        "copper": {"price": 12660, "change": 0},
+        "aluminium": {"price": 3570, "change": 0},
+        "source": "LME reference (April 2026 avg)",
         "updated": datetime.now().strftime("%Y-%m-%d %H:%M"),
     }
 
 
-@st.cache_data(ttl=600)
+@st.cache_data(ttl=1800)
 def get_metal_prices():
-    prices = fetch_from_yahoo()
-    if prices:
-        return prices
-    prices = fetch_from_lme_backup()
+    prices = fetch_from_stooq()
     if prices:
         return prices
     return get_fallback_prices()
@@ -112,8 +107,6 @@ def render_price_ticker():
         .metal-card { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
         .metal-name { color: #ffffff !important; font-size: 13px; font-weight: 600; opacity: 0.8; letter-spacing: 1px; }
         .metal-price { color: #ffffff !important; font-size: 26px; font-weight: 700; margin: 6px 0; }
-        .metal-change-up { color: #00ff88 !important; font-size: 14px; font-weight: 600; }
-        .metal-change-down { color: #ff4466 !important; font-size: 14px; font-weight: 600; }
         .metal-sar { color: #ffcc44 !important; font-size: 12px; margin-top: 4px; opacity: 0.85; }
         .ticker-footer { color: #ffffff !important; font-size: 11px; opacity: 0.6; margin-top: 10px; text-align: right; }
         </style>
@@ -121,15 +114,6 @@ def render_price_ticker():
 
     cu = prices["copper"]
     al = prices["aluminium"]
-
-    def arrow(change):
-        if change > 0:
-            return f'<span class="metal-change-up">&#9650; +{change:.2f}%</span>'
-        elif change < 0:
-            return f'<span class="metal-change-down">&#9660; {change:.2f}%</span>'
-        else:
-            return '<span class="metal-sar">stable</span>'
-
     cu_sar = cu["price"] * USD_TO_SAR
     al_sar = al["price"] * USD_TO_SAR
 
@@ -142,7 +126,6 @@ def render_price_ticker():
                     <div class="metal-card">
                         <div class="metal-name">COPPER (Cu)</div>
                         <div class="metal-price">${cu['price']:,.0f}<span style="font-size:14px; opacity:0.7;"> /ton</span></div>
-                        {arrow(cu['change'])}
                         <div class="metal-sar">&asymp; {cu_sar:,.0f} SAR/ton</div>
                     </div>
                 </td>
@@ -150,7 +133,6 @@ def render_price_ticker():
                     <div class="metal-card">
                         <div class="metal-name">ALUMINIUM (Al)</div>
                         <div class="metal-price">${al['price']:,.0f}<span style="font-size:14px; opacity:0.7;"> /ton</span></div>
-                        {arrow(al['change'])}
                         <div class="metal-sar">&asymp; {al_sar:,.0f} SAR/ton</div>
                     </div>
                 </td>
@@ -181,9 +163,6 @@ except Exception as e:
     st.error(f"AI Configuration Error: {e}")
 
 
-# ─────────────────────────────────────────────
-# 3. Logo helper
-# ─────────────────────────────────────────────
 def display_logo(w):
     if os.path.exists("logo.png"):
         st.image("logo.png", width=w)
@@ -402,9 +381,6 @@ GROUP_AIR_DETAIL = {
 GROUP_GROUND_DETAIL = {1: 1.00, 2: 0.81, 3: 0.69, 4: 0.62, 5: 0.58, 6: 0.54}
 
 
-# ─────────────────────────────────────────────
-# 6. Dataclass & Calculation
-# ─────────────────────────────────────────────
 @dataclass
 class CableResult:
     size_mm2: float
@@ -484,7 +460,7 @@ def select_cable(load_kw, voltage_v, phases, pf, length_m,
     chosen = next((c for c in table if c["Iz"] >= I_required), None)
     if chosen is None:
         chosen = table[-1]
-        warnings.append(f"Load ({I_required:.1f} A required) exceeds max catalog size ({table[-1]['Iz']} A). Consider parallel cables.")
+        warnings.append(f"Load ({I_required:.1f} A required) exceeds max catalog size.")
 
     def vdrop(size):
         R_ac = ac_resistance(conductor, insulation, size)
@@ -503,13 +479,13 @@ def select_cable(load_kw, voltage_v, phases, pf, length_m,
                     break
         vd_v, vd_pct = vdrop(chosen["s"])
         if vd_pct > max_vdrop_pct:
-            warnings.append(f"Voltage drop ({vd_pct:.2f}%) still exceeds {max_vdrop_pct}%. Consider splitting the circuit or reducing cable length.")
+            warnings.append(f"Voltage drop ({vd_pct:.2f}%) still exceeds {max_vdrop_pct}%.")
 
     sc_governed = False
     if sc_size_mm2 > chosen["s"]:
         sc_governed = True
         sc_cable = next((c for c in table if c["s"] >= sc_size_mm2), table[-1])
-        warnings.append(f"Cable upsized from {chosen['s']} mm2 to {sc_cable['s']} mm2 due to short circuit requirement (Isc={isc_ka} kA, t={trip_time_s}s -> min {sc_size_min:.1f} mm2).")
+        warnings.append(f"Cable upsized from {chosen['s']} mm2 to {sc_cable['s']} mm2 due to SC.")
         chosen = sc_cable
         vd_v, vd_pct = vdrop(chosen["s"])
 
@@ -520,7 +496,7 @@ def select_cable(load_kw, voltage_v, phases, pf, length_m,
     if util > 100:
         warnings.append(f"Cable utilisation {util:.1f}% exceeds rated capacity.")
 
-    warnings.append(f"NOTE: This VD ({vd_pct:.2f}%) covers this cable only. Ensure total VD from source to load does not exceed 5% (IEC 60364).")
+    warnings.append(f"NOTE: This VD ({vd_pct:.2f}%) covers this cable only. Ensure total VD < 5%.")
 
     return CableResult(
         size_mm2=chosen["s"],
@@ -575,7 +551,7 @@ def select_single_core(load_kw, voltage_v, phases, pf, length_m,
     chosen = next((c for c in table if c["Iz"] >= I_required), None)
     if chosen is None:
         chosen = table[-1]
-        warnings.append(f"Load ({I_required:.1f} A) exceeds max catalog size ({table[-1]['s']} mm2 = {table[-1]['Iz']} A). Consider parallel single cores.")
+        warnings.append(f"Load ({I_required:.1f} A) exceeds max size.")
 
     R_dc = RESISTANCE_SC[conductor].get(chosen["s"], 0.05)
     alpha = ALPHA[conductor]
@@ -600,8 +576,6 @@ def select_single_core(load_kw, voltage_v, phases, pf, length_m,
                     R_ac = R2_ac
                     break
         vd_v, vd_pct = vdrop(R_ac)
-        if vd_pct > max_vdrop_pct:
-            warnings.append(f"Voltage drop ({vd_pct:.2f}%) still exceeds {max_vdrop_pct}%. Consider parallel cables or reducing length.")
 
     k = SC_K[conductor]["xlpe"]
     sc_size_min = (isc_ka * 1000 * math.sqrt(trip_time_s)) / k
@@ -609,7 +583,6 @@ def select_single_core(load_kw, voltage_v, phases, pf, length_m,
     if sc_size_min > chosen["s"]:
         sc_governed = True
         sc_cable = next((c for c in table if c["s"] >= sc_size_min), table[-1])
-        warnings.append(f"Cable upsized from {chosen['s']} mm2 to {sc_cable['s']} mm2 due to SC requirement (min {sc_size_min:.1f} mm2).")
         chosen = sc_cable
         R_ac = RESISTANCE_SC[conductor].get(chosen["s"], 0.05) * (1 + alpha * (theta - 20))
         vd_v, vd_pct = vdrop(R_ac)
@@ -617,7 +590,7 @@ def select_single_core(load_kw, voltage_v, phases, pf, length_m,
     eff_cap = chosen["Iz"] * total_derate
     util = (IFL / eff_cap * 100) if eff_cap > 0 else 0
 
-    warnings.append(f"NOTE: This VD ({vd_pct:.2f}%) covers this cable only. Ensure total VD from source to load does not exceed 5% (IEC 60364).")
+    warnings.append(f"NOTE: This VD ({vd_pct:.2f}%) covers this cable only. Ensure total VD < 5%.")
 
     return CableResult(
         size_mm2=chosen["s"],
@@ -823,20 +796,19 @@ with tab1:
             if res.sc_governed:
                 st.error(f"Cable upsized by Short Circuit requirement - {sc_label}")
             else:
-                st.info(f"Short circuit check passed - {sc_label} (selected {res.size_mm2} mm2 >= required)")
+                st.info(f"Short circuit check passed - {sc_label}")
 
             st.markdown("**Calculation Details**")
             details = {
                 "Full load current": f"{res.full_load_current} A",
-                "AC resistance at op. temp": f"{res.r_ac_ohm_km} ohm/km",
-                "Temp derating factor": f"x {res.temp_derating} (at {temp_c} C)",
-                "Group derating factor": f"x {res.group_derating} ({num_cables} cables)",
+                "AC resistance": f"{res.r_ac_ohm_km} ohm/km",
+                "Temp derating factor": f"x {res.temp_derating}",
+                "Group derating factor": f"x {res.group_derating}",
                 "Soil thermal derating": f"x {res.soil_thermal_derating}" if show_soil else "N/A",
                 "Burial depth derating": f"x {res.depth_derating}" if show_soil else "N/A",
                 "Effective cable capacity": f"{res.effective_capacity} A",
                 "Cable utilisation": f"{res.utilisation_pct}%",
                 "Voltage drop": f"{res.voltage_drop_v} V ({res.voltage_drop_pct}%)",
-                "SC withstand (min size)": f"{res.sc_size_mm2} mm2",
                 "Cable designation": cable_desig + " 0.6/1 kV",
             }
             for k, v in details.items():
@@ -865,7 +837,7 @@ with tab2:
                           placeholder="e.g. What is the current rating of 4x16mm2 XLPE cable?")
     if query:
         if model is None:
-            st.error("AI model not available. Check your API key.")
+            st.error("AI model not available.")
         else:
             with st.spinner("AI is thinking..."):
                 try:
