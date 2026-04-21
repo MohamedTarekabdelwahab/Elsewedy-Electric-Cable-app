@@ -846,49 +846,93 @@ with tab_vf:
     current_lme_auto = current_prices["copper"]["price"]
 
     st.markdown("---")
+
+    # ── VF Input Mode Toggle ──
+    vf_mode = st.radio(
+        "VF Input Mode",
+        ["Calculate from cable specs", "Enter VF manually"],
+        horizontal=True,
+        help="Choose whether to calculate VF from cable specifications or enter it directly"
+    )
+
     st.markdown("### Step 1: Cable Specifications")
 
-    vf_col1, vf_col2 = st.columns(2)
-    with vf_col1:
-        vf_cores = st.number_input(
-            "Number of cores",
-            min_value=1, max_value=61, value=4, step=1,
-            help="Total number of conductors in the cable"
+    if vf_mode == "Calculate from cable specs":
+        vf_col1, vf_col2 = st.columns(2)
+        with vf_col1:
+            vf_cores = st.number_input(
+                "Number of cores",
+                min_value=1, max_value=61, value=4, step=1,
+                help="Total number of conductors in the cable"
+            )
+        with vf_col2:
+            vf_cross_section = st.number_input(
+                "Cross section area (mm2)",
+                min_value=0.5, max_value=1000.0, value=50.0, step=0.5,
+                help="Conductor cross-sectional area per core"
+            )
+
+        # ── Copper Weight per meter (g/m) ──
+        # Formula: Cores x Cross Section (mm2) x Density (8.96 g/cm3)
+        # Net result: Cores x mm2 x 8.96 = grams per meter
+        copper_weight = vf_cores * vf_cross_section * 8.96  # g/m
+
+        # ── Variance Factor ──
+        # VF = Weight (g/m) x 3.75 / 1000
+        variance_factor = copper_weight * 3.75 / 1000
+
+        st.markdown("---")
+        st.markdown("### Step 2: Calculated Values (per meter)")
+
+        calc_col1, calc_col2 = st.columns(2)
+        calc_col1.metric(
+            "Copper Weight",
+            f"{copper_weight:.2f} g/m",
+            f"{copper_weight/1000:.4f} kg/m"
         )
-    with vf_col2:
-        vf_cross_section = st.number_input(
-            "Cross section area (mm2)",
-            min_value=0.5, max_value=1000.0, value=50.0, step=0.5,
-            help="Conductor cross-sectional area per core"
+        calc_col2.metric(
+            "Variance Factor (VF)",
+            f"{variance_factor:.4f}",
+            "Weight x 3.75 / 1000"
         )
+    else:
+        # ── Manual VF Input ──
+        st.info(
+            "Enter the Variance Factor (VF) directly if you have it pre-calculated "
+            "from your pricing sheet or customer agreement."
+        )
+        vf_cores = None  # not used
+        vf_cross_section = None  # not used
+        copper_weight = None  # not used
 
-    # ── Copper Weight per meter (g/m) ──
-    # Formula: Cores x Cross Section (mm2) x Density (8.96 g/cm3)
-    # Since mm2 x 1m = 1 cm3 x 1000, but density is g/cm3...
-    # Net result: Cores x mm2 x 8.96 = grams per meter
-    copper_weight = vf_cores * vf_cross_section * 8.96  # g/m
-
-    # ── Variance Factor ──
-    # VF = Weight (g/m) x 3.75 / 1000
-    variance_factor = copper_weight * 3.75 / 1000
-
-    st.markdown("---")
-    st.markdown("### Step 2: Calculated Values (per meter)")
-
-    calc_col1, calc_col2 = st.columns(2)
-    calc_col1.metric(
-        "Copper Weight",
-        f"{copper_weight:.2f} g/m",
-        f"{copper_weight/1000:.4f} kg/m"
-    )
-    calc_col2.metric(
-        "Variance Factor (VF)",
-        f"{variance_factor:.4f}",
-        "Weight x 3.75 / 1000"
-    )
+        vf_manual_col1, vf_manual_col2 = st.columns([1, 2])
+        with vf_manual_col1:
+            variance_factor = st.number_input(
+                "Variance Factor (VF)",
+                min_value=0.0, max_value=1000.0, value=6.72, step=0.01, format="%.4f",
+                help="Enter VF value directly (typically between 0.1 and 100)"
+            )
+        with vf_manual_col2:
+            st.markdown("")
+            st.markdown("")
+            st.metric("Variance Factor (VF)", f"{variance_factor:.4f}", "Manual entry")
 
     st.markdown("---")
     st.markdown("### Step 3: Price Calculation")
+
+    # ── Formula display ──
+    st.markdown("""
+    <div style="background: #e3f2fd; border-left: 4px solid #1976d2; padding: 12px 16px; border-radius: 6px; margin-bottom: 15px;">
+        <div style="color: #1565c0; font-weight: 600; font-size: 13px; margin-bottom: 4px;">FORMULA</div>
+        <div style="color: #0d47a1; font-family: 'Courier New', monospace; font-size: 15px;">
+            P<sub>2</sub> = P<sub>1</sub> + [ VF × (LME<sub>2</sub> − LME<sub>1</sub>) / 1000 ]
+        </div>
+        <div style="color: #555; font-size: 12px; margin-top: 6px;">
+            If LME<sub>2</sub> &gt; LME<sub>1</sub> → price <b style="color:#d32f2f;">increases (+)</b>  |  
+            If LME<sub>2</sub> &lt; LME<sub>1</sub> → price <b style="color:#2e7d32;">decreases (−)</b>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     price_col1, price_col2, price_col3 = st.columns(3)
     with price_col1:
@@ -924,9 +968,49 @@ with tab_vf:
     price_adjustment = variance_factor * lme_diff / 1000  # SAR/m
     sales_price = quoted_price + price_adjustment
 
+    # Determine direction for visual feedback
+    if price_adjustment > 0.01:
+        direction = "INCREASE"
+        direction_color = "#d32f2f"  # Red (customer pays more)
+        direction_arrow = "▲"
+        direction_sign = "+"
+    elif price_adjustment < -0.01:
+        direction = "DECREASE"
+        direction_color = "#2e7d32"  # Green (customer pays less)
+        direction_arrow = "▼"
+        direction_sign = "−"
+    else:
+        direction = "NO CHANGE"
+        direction_color = "#757575"  # Gray
+        direction_arrow = "■"
+        direction_sign = ""
+
     st.markdown("---")
     st.markdown("### Result (per meter)")
 
+    # ── Big visual summary box ──
+    summary_html = f"""
+    <div style="background: linear-gradient(135deg, {direction_color}15 0%, {direction_color}25 100%);
+                border-left: 6px solid {direction_color};
+                border-radius: 10px;
+                padding: 20px;
+                margin: 15px 0;
+                text-align: center;">
+        <div style="color: {direction_color}; font-size: 13px; font-weight: 700; letter-spacing: 2px;">
+            {direction_arrow} PRICE {direction}
+        </div>
+        <div style="color: {direction_color}; font-size: 36px; font-weight: 800; margin: 10px 0;">
+            {direction_sign}{abs(price_adjustment):,.2f} SAR/m
+        </div>
+        <div style="color: #333; font-size: 14px;">
+            Quoted: <b>{quoted_price:,.2f}</b> SAR/m  &nbsp;→&nbsp;
+            Sales: <b>{sales_price:,.2f}</b> SAR/m
+        </div>
+    </div>
+    """
+    st.markdown(summary_html, unsafe_allow_html=True)
+
+    # ── Metrics row ──
     result_col1, result_col2, result_col3 = st.columns(3)
     result_col1.metric(
         "LME Change",
@@ -944,23 +1028,24 @@ with tab_vf:
         f"{((sales_price-quoted_price)/quoted_price*100):+.2f}%" if quoted_price > 0 else "N/A"
     )
 
-    # ── Visual feedback ──
-    if price_adjustment > 0:
+    # ── Visual feedback message ──
+    if price_adjustment > 0.01:
         st.warning(
-            f"Price increased by {price_adjustment:,.2f} SAR/m due to LME rise of "
-            f"${lme_diff:,.0f}/ton since quotation."
+            f"**LME increased by ${lme_diff:,.0f}/ton** since quotation. "
+            f"New sales price must ADD {price_adjustment:,.2f} SAR/m to recover copper cost."
         )
-    elif price_adjustment < 0:
+    elif price_adjustment < -0.01:
         st.success(
-            f"Price decreased by {abs(price_adjustment):,.2f} SAR/m due to LME drop of "
-            f"${abs(lme_diff):,.0f}/ton since quotation."
+            f"**LME decreased by ${abs(lme_diff):,.0f}/ton** since quotation. "
+            f"Customer benefits: price reduced by {abs(price_adjustment):,.2f} SAR/m."
         )
     else:
-        st.info("No price change - LME prices match.")
+        st.info("No significant change in LME price since quotation.")
 
     # ── Formula breakdown (expander) ──
     with st.expander("Show formula breakdown"):
-        st.markdown(f"""
+        if vf_mode == "Calculate from cable specs":
+            st.markdown(f"""
 **Step 1 - Copper Weight per meter:**
 ```
 Weight = Cores x Cross Section x Density
@@ -982,7 +1067,22 @@ Sales = {quoted_price:,.2f} + {variance_factor:.4f} x ({current_lme:,.0f} - {old
 Sales = {quoted_price:,.2f} + {price_adjustment:+,.4f}
 Sales = {sales_price:,.2f} SAR/m
 ```
-        """)
+            """)
+        else:
+            st.markdown(f"""
+**Step 1 - Variance Factor (VF):**
+```
+VF = {variance_factor:.4f}  (entered manually)
+```
+
+**Step 2 - Sales Price (P2 = P1 + VF x (LME2 - LME1) / 1000):**
+```
+Sales = Quoted + VF x (Current LME - Old LME) / 1000
+Sales = {quoted_price:,.2f} + {variance_factor:.4f} x ({current_lme:,.0f} - {old_lme:,.0f}) / 1000
+Sales = {quoted_price:,.2f} + {price_adjustment:+,.4f}
+Sales = {sales_price:,.2f} SAR/m
+```
+            """)
 
 
 with tab2:
