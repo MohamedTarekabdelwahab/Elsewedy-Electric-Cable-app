@@ -2,6 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 import math
 import os
+import glob 
 from dataclasses import dataclass
 
 # ─────────────────────────────────────────────
@@ -725,12 +726,39 @@ with st.sidebar:
     st.markdown("**Eng. Mohamed Tarek**  \n📞 +966570514091  \n📧 Mohamed.abdelwahab@elsewedy.com")
     st.markdown("---")
     st.subheader("📥 Downloads")
+
+    # الكتالوج الرئيسي
     pdf_path = "EE KSA Brochure.pdf"
     if os.path.exists(pdf_path):
         with open(pdf_path, "rb") as f:
-            st.download_button("📄 Download EE KSA Brochure", f,
-                               file_name="Elsewedy_KSA_Brochure.pdf",
-                               mime="application/pdf")
+            st.download_button(
+                "📄 EE KSA Brochure",
+                f,
+                file_name="Elsewedy_KSA_Brochure.pdf",
+                mime="application/pdf",
+                use_container_width=True,
+                key="main_brochure"
+            )
+
+    # الكتالوجات الإضافية (قراءة تلقائية)
+    catalogs_folder = "catalogs"
+    if os.path.exists(catalogs_folder):
+        pdf_files = sorted(glob.glob(os.path.join(catalogs_folder, "*.pdf")))
+        if pdf_files:
+            st.markdown("---")
+            st.markdown("**📚 Product Catalogs**")
+            for pdf_file in pdf_files:
+                file_name = os.path.basename(pdf_file)
+                display_name = file_name.replace(".pdf", "").replace("_", " ").replace("-", " ")
+                with open(pdf_file, "rb") as f:
+                    st.download_button(
+                        f"📑 {display_name}",
+                        f,
+                        file_name=file_name,
+                        mime="application/pdf",
+                        use_container_width=True,
+                        key=f"cat_{file_name}"
+                    )
 
 # ─────────────────────────────────────────────
 # 8. Main UI
