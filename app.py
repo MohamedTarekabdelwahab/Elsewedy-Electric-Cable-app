@@ -664,7 +664,7 @@ render_price_ticker()
 
 st.markdown("---")
 
-tab1, tab2 = st.tabs(["Cable Size Calculator", "Technical Support"])
+tab1, tab_vf, tab2 = st.tabs(["Cable Size Calculator", "Price Variance (VF)", "Technical Support"])
 
 with tab1:
     st.subheader("Cable Size Selection - Elsewedy Catalog (IEC 60502)")
@@ -830,6 +830,160 @@ with tab1:
 
         except Exception as e:
             st.error(f"Calculation error: {e}")
+
+
+# ─────────────────────────────────────────────
+# TAB: Price Variance Calculator (VF) - Copper, SAR, per meter
+# ─────────────────────────────────────────────
+with tab_vf:
+    st.subheader("Price Variance Calculator (VF) - Copper / SAR")
+    st.markdown(
+        "Calculate cable sales price per meter based on copper LME price variance."
+    )
+
+    # Get current LME price (USD/ton) from the live ticker
+    current_prices = get_metal_prices()
+    current_lme_auto = current_prices["copper"]["price"]
+
+    st.markdown("---")
+    st.markdown("### Step 1: Cable Specifications")
+
+    vf_col1, vf_col2 = st.columns(2)
+    with vf_col1:
+        vf_cores = st.number_input(
+            "Number of cores",
+            min_value=1, max_value=61, value=4, step=1,
+            help="Total number of conductors in the cable"
+        )
+    with vf_col2:
+        vf_cross_section = st.number_input(
+            "Cross section area (mm2)",
+            min_value=0.5, max_value=1000.0, value=50.0, step=0.5,
+            help="Conductor cross-sectional area per core"
+        )
+
+    # ── Copper Weight per meter (kg/m) ──
+    # Formula: Cores x Cross Section x Density (8.96)
+    # Density 8.96 g/cm3 -> for 1m cable, weight = cores x mm2 x 8.96 (in grams)
+    # Divide by 1000 to get kg/m
+    copper_weight = vf_cores * vf_cross_section * 8.96 / 1000  # kg/m
+
+    # ── Variance Factor ──
+    # VF = Weight x 3.75 / 1000
+    variance_factor = copper_weight * 3.75 / 1000
+
+    st.markdown("---")
+    st.markdown("### Step 2: Calculated Values (per meter)")
+
+    calc_col1, calc_col2 = st.columns(2)
+    calc_col1.metric(
+        "Copper Weight",
+        f"{copper_weight:.4f} kg/m",
+        f"{copper_weight*1000:.1f} g/m"
+    )
+    calc_col2.metric(
+        "Variance Factor (VF)",
+        f"{variance_factor:.6f}",
+        "Weight x 3.75 / 1000"
+    )
+
+    st.markdown("---")
+    st.markdown("### Step 3: Price Calculation")
+
+    price_col1, price_col2, price_col3 = st.columns(3)
+    with price_col1:
+        quoted_price = st.number_input(
+            "Quoted Price (SAR/m)",
+            min_value=0.0, value=100.0, step=1.0,
+            help="Original price per meter given to customer"
+        )
+    with price_col2:
+        old_lme = st.number_input(
+            "Old LME Price (USD/ton)",
+            min_value=0.0, value=9500.0, step=50.0,
+            help="LME copper price at the time of quotation"
+        )
+    with price_col3:
+        use_auto_lme = st.checkbox(
+            "Use live LME price",
+            value=True,
+            help=f"Current live price: ${current_lme_auto:,.0f}/ton"
+        )
+        if use_auto_lme:
+            current_lme = current_lme_auto
+            st.info(f"Live: ${current_lme:,.0f}/ton")
+        else:
+            current_lme = st.number_input(
+                "Current LME Price (USD/ton)",
+                min_value=0.0, value=float(current_lme_auto), step=50.0
+            )
+
+    # ── Sales Price Formula ──
+    # Sales = Quoted + VF x (Current LME - Old LME) / 1000
+    lme_diff = current_lme - old_lme
+    price_adjustment = variance_factor * lme_diff / 1000  # SAR/m
+    sales_price = quoted_price + price_adjustment
+
+    st.markdown("---")
+    st.markdown("### Result (per meter)")
+
+    result_col1, result_col2, result_col3 = st.columns(3)
+    result_col1.metric(
+        "LME Change",
+        f"${lme_diff:+,.0f}/ton",
+        f"{(lme_diff/old_lme*100):+.2f}%" if old_lme > 0 else "N/A"
+    )
+    result_col2.metric(
+        "Price Adjustment",
+        f"{price_adjustment:+,.2f} SAR/m",
+        "VF x (LME diff) / 1000"
+    )
+    result_col3.metric(
+        "Sales Price",
+        f"{sales_price:,.2f} SAR/m",
+        f"{((sales_price-quoted_price)/quoted_price*100):+.2f}%" if quoted_price > 0 else "N/A"
+    )
+
+    # ── Visual feedback ──
+    if price_adjustment > 0:
+        st.warning(
+            f"Price increased by {price_adjustment:,.2f} SAR/m due to LME rise of "
+            f"${lme_diff:,.0f}/ton since quotation."
+        )
+    elif price_adjustment < 0:
+        st.success(
+            f"Price decreased by {abs(price_adjustment):,.2f} SAR/m due to LME drop of "
+            f"${abs(lme_diff):,.0f}/ton since quotation."
+        )
+    else:
+        st.info("No price change - LME prices match.")
+
+    # ── Formula breakdown (expander) ──
+    with st.expander("Show formula breakdown"):
+        st.markdown(f"""
+**Step 1 - Copper Weight per meter:**
+```
+Weight = Cores x Cross Section x Density / 1000
+Weight = {vf_cores} x {vf_cross_section} x 8.96 / 1000
+Weight = {copper_weight:.4f} kg/m
+```
+
+**Step 2 - Variance Factor (VF):**
+```
+VF = Copper Weight x 3.75 / 1000
+VF = {copper_weight:.4f} x 3.75 / 1000
+VF = {variance_factor:.6f}
+```
+
+**Step 3 - Sales Price:**
+```
+Sales = Quoted + VF x (Current LME - Old LME) / 1000
+Sales = {quoted_price:,.2f} + {variance_factor:.6f} x ({current_lme:,.0f} - {old_lme:,.0f}) / 1000
+Sales = {quoted_price:,.2f} + {price_adjustment:+,.4f}
+Sales = {sales_price:,.2f} SAR/m
+```
+        """)
+
 
 with tab2:
     st.subheader("AI Technical Support")
