@@ -862,14 +862,14 @@ with tab_vf:
             help="Conductor cross-sectional area per core"
         )
 
-    # ── Copper Weight per meter (kg/m) ──
-    # Formula: Cores x Cross Section x Density (8.96)
-    # Density 8.96 g/cm3 -> for 1m cable, weight = cores x mm2 x 8.96 (in grams)
-    # Divide by 1000 to get kg/m
-    copper_weight = vf_cores * vf_cross_section * 8.96 / 1000  # kg/m
+    # ── Copper Weight per meter (g/m) ──
+    # Formula: Cores x Cross Section (mm2) x Density (8.96 g/cm3)
+    # Since mm2 x 1m = 1 cm3 x 1000, but density is g/cm3...
+    # Net result: Cores x mm2 x 8.96 = grams per meter
+    copper_weight = vf_cores * vf_cross_section * 8.96  # g/m
 
     # ── Variance Factor ──
-    # VF = Weight x 3.75 / 1000
+    # VF = Weight (g/m) x 3.75 / 1000
     variance_factor = copper_weight * 3.75 / 1000
 
     st.markdown("---")
@@ -878,12 +878,12 @@ with tab_vf:
     calc_col1, calc_col2 = st.columns(2)
     calc_col1.metric(
         "Copper Weight",
-        f"{copper_weight:.4f} kg/m",
-        f"{copper_weight*1000:.1f} g/m"
+        f"{copper_weight:.2f} g/m",
+        f"{copper_weight/1000:.4f} kg/m"
     )
     calc_col2.metric(
         "Variance Factor (VF)",
-        f"{variance_factor:.6f}",
+        f"{variance_factor:.4f}",
         "Weight x 3.75 / 1000"
     )
 
@@ -919,7 +919,7 @@ with tab_vf:
             )
 
     # ── Sales Price Formula ──
-    # Sales = Quoted + VF x (Current LME - Old LME) / 1000
+    # P2 = P1 + (VF x (LME2 - LME1) / 1000)
     lme_diff = current_lme - old_lme
     price_adjustment = variance_factor * lme_diff / 1000  # SAR/m
     sales_price = quoted_price + price_adjustment
@@ -963,22 +963,22 @@ with tab_vf:
         st.markdown(f"""
 **Step 1 - Copper Weight per meter:**
 ```
-Weight = Cores x Cross Section x Density / 1000
-Weight = {vf_cores} x {vf_cross_section} x 8.96 / 1000
-Weight = {copper_weight:.4f} kg/m
+Weight = Cores x Cross Section x Density
+Weight = {vf_cores} x {vf_cross_section} x 8.96
+Weight = {copper_weight:.2f} g/m
 ```
 
 **Step 2 - Variance Factor (VF):**
 ```
 VF = Copper Weight x 3.75 / 1000
-VF = {copper_weight:.4f} x 3.75 / 1000
-VF = {variance_factor:.6f}
+VF = {copper_weight:.2f} x 3.75 / 1000
+VF = {variance_factor:.4f}
 ```
 
-**Step 3 - Sales Price:**
+**Step 3 - Sales Price (P2 = P1 + VF x (LME2 - LME1) / 1000):**
 ```
 Sales = Quoted + VF x (Current LME - Old LME) / 1000
-Sales = {quoted_price:,.2f} + {variance_factor:.6f} x ({current_lme:,.0f} - {old_lme:,.0f}) / 1000
+Sales = {quoted_price:,.2f} + {variance_factor:.4f} x ({current_lme:,.0f} - {old_lme:,.0f}) / 1000
 Sales = {quoted_price:,.2f} + {price_adjustment:+,.4f}
 Sales = {sales_price:,.2f} SAR/m
 ```
