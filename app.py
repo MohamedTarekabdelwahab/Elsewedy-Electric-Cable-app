@@ -381,6 +381,349 @@ GROUP_AIR_DETAIL = {
 GROUP_GROUND_DETAIL = {1: 1.00, 2: 0.81, 3: 0.69, 4: 0.62, 5: 0.58, 6: 0.54}
 
 
+# ─────────────────────────────────────────────
+# OD & WEIGHT DATABASE - From Elsewedy Catalog
+# Structure: OD_DATA[conductor][armour][cores][size] = {"od": mm, "weight": kg/km}
+# Insulation always XLPE/PVC for LV cables in catalog
+# ─────────────────────────────────────────────
+OD_DATA = {
+    # ═══════════════════════════════════════════
+    # COPPER CABLES
+    # ═══════════════════════════════════════════
+    "cu": {
+        # ─── Unarmoured (CX1-T104 series) ───
+        "unarmoured": {
+            # 4-core Cu/XLPE/PVC (Image 1)
+            4: {
+                1.5:  {"od": 10.3, "weight": 155},
+                2.5:  {"od": 11.4, "weight": 210},
+                4:    {"od": 12.6, "weight": 280},
+                6:    {"od": 14.0, "weight": 385},
+                10:   {"od": 15.5, "weight": 535},
+                16:   {"od": 17.9, "weight": 790},
+                25:   {"od": 22.1, "weight": 1170},
+                35:   {"od": 24.8, "weight": 1545},
+                50:   {"od": 26.3, "weight": 1970},
+                70:   {"od": 30.4, "weight": 2825},
+                95:   {"od": 33.1, "weight": 3825},
+                120:  {"od": 37.2, "weight": 4785},
+                150:  {"od": 41.7, "weight": 5875},
+                185:  {"od": 46.7, "weight": 7395},
+                240:  {"od": 52.5, "weight": 9620},
+                300:  {"od": 58.1, "weight": 11995},
+                400:  {"od": 66.7, "weight": 15480},
+                500:  {"od": 74.2, "weight": 19815},
+            },
+            # 3-core Cu - using 4-core reduced neutral data as approximation
+            3: {
+                1.5:  {"od": 9.5,  "weight": 135},
+                2.5:  {"od": 10.5, "weight": 180},
+                4:    {"od": 11.6, "weight": 240},
+                6:    {"od": 12.8, "weight": 330},
+                10:   {"od": 14.2, "weight": 455},
+                16:   {"od": 16.4, "weight": 675},
+                25:   {"od": 20.2, "weight": 1000},
+                35:   {"od": 22.7, "weight": 1320},
+                50:   {"od": 24.0, "weight": 1685},
+                70:   {"od": 27.8, "weight": 2415},
+                95:   {"od": 30.2, "weight": 3270},
+                120:  {"od": 34.0, "weight": 4090},
+                150:  {"od": 38.1, "weight": 5025},
+                185:  {"od": 42.7, "weight": 6325},
+                240:  {"od": 48.0, "weight": 8225},
+                300:  {"od": 53.1, "weight": 10255},
+            },
+        },
+        # ─── STA Armoured (CX1-T102/T103 series) - Image 3 ───
+        "sta": {
+            2: {
+                6:    {"od": 15.0, "weight": 405},
+                10:   {"od": 16.2, "weight": 510},
+                16:   {"od": 18.2, "weight": 680},
+                25:   {"od": 21.1, "weight": 865},
+                35:   {"od": 23.3, "weight": 1090},
+                50:   {"od": 22.9, "weight": 1235},
+                70:   {"od": 25.1, "weight": 1675},
+                95:   {"od": 29.9, "weight": 2265},
+                120:  {"od": 33.7, "weight": 3085},
+                150:  {"od": 36.5, "weight": 3695},
+                185:  {"od": 41.5, "weight": 4595},
+                240:  {"od": 45.6, "weight": 5805},
+                300:  {"od": 49.0, "weight": 7070},
+                400:  {"od": 54.7, "weight": 8925},
+            },
+            3: {
+                6:    {"od": 15.8, "weight": 475},
+                10:   {"od": 17.1, "weight": 605},
+                16:   {"od": 19.3, "weight": 830},
+                25:   {"od": 22.3, "weight": 1120},
+                35:   {"od": 24.7, "weight": 1435},
+                50:   {"od": 24.6, "weight": 1700},
+                70:   {"od": 28.5, "weight": 2390},
+                95:   {"od": 32.0, "weight": 3205},
+                120:  {"od": 36.6, "weight": 4280},
+                150:  {"od": 39.9, "weight": 5195},
+                185:  {"od": 43.9, "weight": 6385},
+                240:  {"od": 49.2, "weight": 8195},
+                300:  {"od": 53.9, "weight": 10075},
+                400:  {"od": 61.1, "weight": 12810},
+                500:  {"od": 67.8, "weight": 16245},
+            },
+        },
+        # ─── SWA Armoured (CX1-T102/T103 series) - Image 5 ───
+        "swa": {
+            2: {
+                4:    {"od": 14.6, "weight": 410},
+                6:    {"od": 15.8, "weight": 500},
+                10:   {"od": 17.7, "weight": 700},
+                16:   {"od": 19.8, "weight": 900},
+                25:   {"od": 24.4, "weight": 1335},
+                35:   {"od": 26.6, "weight": 1620},
+                50:   {"od": 26.2, "weight": 1750},
+                70:   {"od": 28.6, "weight": 2255},
+                95:   {"od": 32.9, "weight": 3105},
+                120:  {"od": 36.4, "weight": 3735},
+                150:  {"od": 39.0, "weight": 4365},
+                185:  {"od": 45.2, "weight": 5790},
+                240:  {"od": 49.3, "weight": 7105},
+                300:  {"od": 52.5, "weight": 8455},
+                400:  {"od": 58.4, "weight": 10495},
+            },
+            3: {
+                4:    {"od": 15.3, "weight": 465},
+                6:    {"od": 16.6, "weight": 570},
+                10:   {"od": 18.5, "weight": 810},
+                16:   {"od": 20.7, "weight": 1065},
+                25:   {"od": 25.6, "weight": 1620},
+                35:   {"od": 28.0, "weight": 1990},
+                50:   {"od": 28.1, "weight": 2265},
+                70:   {"od": 32.4, "weight": 3205},
+                95:   {"od": 35.9, "weight": 4135},
+                120:  {"od": 39.1, "weight": 4945},
+                150:  {"od": 43.6, "weight": 6330},
+                185:  {"od": 47.6, "weight": 7625},
+                240:  {"od": 52.7, "weight": 9580},
+                300:  {"od": 57.6, "weight": 11615},
+                400:  {"od": 64.8, "weight": 14570},
+                500:  {"od": 73.0, "weight": 19020},
+            },
+        },
+    },
+    # ═══════════════════════════════════════════
+    # ALUMINIUM CABLES
+    # ═══════════════════════════════════════════
+    "al": {
+        # ─── Unarmoured (AX1-T102/T103 series) - Image 2 ───
+        "unarmoured": {
+            2: {
+                16:   {"od": 15.9, "weight": 270},
+                25:   {"od": 18.9, "weight": 375},
+                35:   {"od": 21.1, "weight": 470},
+                50:   {"od": 24.1, "weight": 585},
+                70:   {"od": 27.7, "weight": 765},
+                95:   {"od": 31.1, "weight": 985},
+                120:  {"od": 34.5, "weight": 1230},
+                150:  {"od": 38.3, "weight": 1520},
+                185:  {"od": 42.7, "weight": 1865},
+                240:  {"od": 48.1, "weight": 2380},
+                300:  {"od": 53.7, "weight": 2975},
+                400:  {"od": 60.3, "weight": 3785},
+            },
+            3: {
+                16:   {"od": 16.9, "weight": 320},
+                25:   {"od": 20.1, "weight": 450},
+                35:   {"od": 22.5, "weight": 565},
+                50:   {"od": 22.6, "weight": 650},
+                70:   {"od": 26.1, "weight": 890},
+                95:   {"od": 29.4, "weight": 1150},
+                120:  {"od": 32.8, "weight": 1415},
+                150:  {"od": 35.9, "weight": 1765},
+                185:  {"od": 39.9, "weight": 2150},
+                240:  {"od": 45.0, "weight": 2795},
+                300:  {"od": 49.9, "weight": 3415},
+                400:  {"od": 57.3, "weight": 4535},
+                500:  {"od": 63.8, "weight": 5705},
+            },
+        },
+        # ─── STA Armoured - Image 4 ───
+        "sta": {
+            2: {
+                16:   {"od": 18.1, "weight": 430},
+                25:   {"od": 21.1, "weight": 565},
+                35:   {"od": 23.3, "weight": 680},
+                50:   {"od": 26.3, "weight": 830},
+                70:   {"od": 30.1, "weight": 1060},
+                95:   {"od": 33.7, "weight": 1330},
+                120:  {"od": 38.3, "weight": 1955},
+                150:  {"od": 42.1, "weight": 2325},
+                185:  {"od": 46.9, "weight": 2810},
+                240:  {"od": 52.3, "weight": 3440},
+                300:  {"od": 57.9, "weight": 4155},
+                400:  {"od": 64.5, "weight": 5100},
+            },
+            3: {
+                16:   {"od": 19.1, "weight": 500},
+                25:   {"od": 22.3, "weight": 675},
+                35:   {"od": 24.7, "weight": 820},
+                50:   {"od": 28.5, "weight": 855},
+                70:   {"od": 28.5, "weight": 1145},
+                95:   {"od": 32.0, "weight": 1460},
+                120:  {"od": 36.6, "weight": 2090},
+                150:  {"od": 39.9, "weight": 2525},
+                185:  {"od": 43.9, "weight": 2980},
+                240:  {"od": 49.2, "weight": 3745},
+                300:  {"od": 53.9, "weight": 4440},
+                400:  {"od": 61.1, "weight": 5670},
+                500:  {"od": 67.8, "weight": 7005},
+            },
+        },
+        # ─── SWA Armoured - Image 6 ───
+        "swa": {
+            2: {
+                16:   {"od": 20.3, "weight": 695},
+                25:   {"od": 24.4, "weight": 1035},
+                35:   {"od": 26.6, "weight": 1210},
+                50:   {"od": 29.6, "weight": 1420},
+                70:   {"od": 33.6, "weight": 1765},
+                95:   {"od": 37.6, "weight": 2325},
+                120:  {"od": 41.0, "weight": 2690},
+                150:  {"od": 44.6, "weight": 3105},
+                185:  {"od": 50.6, "weight": 4160},
+                240:  {"od": 56.0, "weight": 4955},
+                300:  {"od": 61.4, "weight": 5800},
+                400:  {"od": 68.2, "weight": 6965},
+            },
+            3: {
+                16:   {"od": 21.3, "weight": 780},
+                25:   {"od": 25.6, "weight": 1170},
+                35:   {"od": 28.0, "weight": 1375},
+                50:   {"od": 28.1, "weight": 1420},
+                70:   {"od": 32.4, "weight": 1960},
+                95:   {"od": 35.9, "weight": 2385},
+                120:  {"od": 39.1, "weight": 2755},
+                150:  {"od": 43.6, "weight": 3660},
+                185:  {"od": 47.6, "weight": 4220},
+                240:  {"od": 52.7, "weight": 5125},
+                300:  {"od": 57.6, "weight": 5980},
+                400:  {"od": 64.8, "weight": 7430},
+                500:  {"od": 73.0, "weight": 9780},
+            },
+        },
+    },
+}
+
+# ─────────────────────────────────────────────
+# SINGLE CORE OD & WEIGHT DATABASE
+# ─────────────────────────────────────────────
+OD_DATA_SINGLE = {
+    "cu": {
+        # Unarmoured Cu Single Core - Image 7
+        "unarmoured": {
+            4:     {"od": 6.5,  "weight": 75},
+            6:     {"od": 7.0,  "weight": 98},
+            10:    {"od": 7.7,  "weight": 135},
+            16:    {"od": 8.7,  "weight": 195},
+            25:    {"od": 10.0, "weight": 285},
+            35:    {"od": 11.1, "weight": 380},
+            50:    {"od": 12.6, "weight": 500},
+            70:    {"od": 14.4, "weight": 700},
+            95:    {"od": 16.1, "weight": 950},
+            120:   {"od": 17.7, "weight": 1190},
+            150:   {"od": 19.7, "weight": 1465},
+            185:   {"od": 21.9, "weight": 1815},
+            240:   {"od": 24.6, "weight": 2365},
+            300:   {"od": 27.2, "weight": 2945},
+            400:   {"od": 30.6, "weight": 3780},
+            500:   {"od": 34.6, "weight": 4845},
+            630:   {"od": 38.9, "weight": 6165},
+            800:   {"od": 43.8, "weight": 8045},
+            1000:  {"od": 51.1, "weight": 10050},
+        },
+        # AWA Armoured Cu Single Core - Image 9
+        "awa": {
+            25:    {"od": 16.5, "weight": 515},
+            35:    {"od": 17.6, "weight": 625},
+            50:    {"od": 19.1, "weight": 770},
+            70:    {"od": 20.9, "weight": 1000},
+            95:    {"od": 22.4, "weight": 1275},
+            120:   {"od": 24.0, "weight": 1530},
+            150:   {"od": 25.8, "weight": 1830},
+            185:   {"od": 27.9, "weight": 2220},
+            240:   {"od": 30.7, "weight": 2810},
+            300:   {"od": 33.5, "weight": 3435},
+            400:   {"od": 37.2, "weight": 4375},
+            500:   {"od": 41.2, "weight": 5510},
+            630:   {"od": 47.1, "weight": 6860},
+            800:   {"od": 51.6, "weight": 9055},
+            1000:  {"od": 59.1, "weight": 11245},
+        },
+    },
+    "al": {
+        # Unarmoured Al Single Core - Image 8
+        "unarmoured": {
+            16:    {"od": 8.5,  "weight": 100},
+            25:    {"od": 10.0, "weight": 140},
+            35:    {"od": 11.1, "weight": 175},
+            50:    {"od": 12.6, "weight": 220},
+            70:    {"od": 14.4, "weight": 295},
+            95:    {"od": 16.1, "weight": 380},
+            120:   {"od": 17.7, "weight": 465},
+            150:   {"od": 19.7, "weight": 575},
+            185:   {"od": 21.9, "weight": 700},
+            240:   {"od": 24.5, "weight": 900},
+            300:   {"od": 27.3, "weight": 1115},
+            400:   {"od": 30.8, "weight": 1420},
+            500:   {"od": 34.5, "weight": 1785},
+            630:   {"od": 38.8, "weight": 2300},
+            800:   {"od": 44.2, "weight": 2950},
+            1000:  {"od": 51.1, "weight": 3655},
+        },
+        # AWA Armoured Al Single Core - Image 10
+        "awa": {
+            16:    {"od": 15.0, "weight": 295},
+            25:    {"od": 16.5, "weight": 365},
+            35:    {"od": 17.6, "weight": 420},
+            50:    {"od": 19.1, "weight": 490},
+            70:    {"od": 20.9, "weight": 595},
+            95:    {"od": 22.4, "weight": 700},
+            120:   {"od": 24.0, "weight": 805},
+            150:   {"od": 25.8, "weight": 940},
+            185:   {"od": 27.9, "weight": 1105},
+            240:   {"od": 30.6, "weight": 1345},
+            300:   {"od": 33.4, "weight": 1600},
+            400:   {"od": 37.2, "weight": 2015},
+            500:   {"od": 41.2, "weight": 2445},
+            630:   {"od": 45.0, "weight": 2990},
+            800:   {"od": 52.0, "weight": 3980},
+            1000:  {"od": 59.1, "weight": 4850},
+        },
+    },
+}
+
+
+def get_cable_dimensions(conductor, cores, size_mm2, armour="unarmoured", is_single_core=False):
+    """
+    Look up OD and Weight from Elsewedy catalog.
+    Returns dict {"od": mm, "weight": kg/km} or None if not found.
+
+    Args:
+        conductor: "cu" or "al"
+        cores: 1, 2, 3, or 4
+        size_mm2: nominal cross section
+        armour: "unarmoured", "sta", "swa" (multicore) or "unarmoured", "awa" (single core)
+        is_single_core: True for single core cables
+    """
+    try:
+        if is_single_core:
+            data = OD_DATA_SINGLE[conductor][armour]
+            return data.get(size_mm2)
+        else:
+            data = OD_DATA[conductor][armour][cores]
+            return data.get(size_mm2)
+    except (KeyError, TypeError):
+        return None
+
+
 @dataclass
 class CableResult:
     size_mm2: float
@@ -715,6 +1058,19 @@ with tab1:
                                                            "ground": "Direct buried",
                                                            "duct": "In underground duct"}[x])
 
+        # ── Armour selection for dimension lookup ──
+        if cable_type == "single_core":
+            armour_options = ["unarmoured", "awa"]
+            armour_labels = {"unarmoured": "Unarmoured", "awa": "AWA (Aluminium Wire)"}
+        else:
+            armour_options = ["unarmoured", "swa", "sta"]
+            armour_labels = {"unarmoured": "Unarmoured", "swa": "SWA (Steel Wire)", "sta": "STA (Steel Tape)"}
+
+        armour = st.selectbox("Armour Type",
+                              armour_options,
+                              format_func=lambda x: armour_labels[x],
+                              help="Used for OD and weight lookup from Elsewedy catalog")
+
     soil_thermal = 1.2
     burial_depth = 0.8
     if installation in ["ground", "duct"]:
@@ -820,6 +1176,57 @@ with tab1:
                 c1, c2 = st.columns([2, 3])
                 c1.markdown(f"<span style='color:#666'>{k}</span>", unsafe_allow_html=True)
                 c2.markdown(f"**{v}**")
+
+            # ── Cable Physical Dimensions (from Elsewedy catalog) ──
+            st.markdown("---")
+            st.markdown("### 📏 Cable Physical Dimensions")
+
+            is_sc = (cable_type == "single_core")
+            # For multicore: use 4 if neutral required, else 3
+            lookup_cores = (4 if neutral else 3) if not is_sc else 1
+
+            dims = get_cable_dimensions(
+                conductor=conductor,
+                cores=lookup_cores,
+                size_mm2=res.size_mm2,
+                armour=armour,
+                is_single_core=is_sc
+            )
+
+            if dims:
+                dim_col1, dim_col2, dim_col3 = st.columns(3)
+                dim_col1.metric(
+                    "Overall Diameter (OD)",
+                    f"{dims['od']} mm",
+                    "Approx."
+                )
+                dim_col2.metric(
+                    "Cable Weight",
+                    f"{dims['weight']:,} kg/km",
+                    f"{dims['weight']/1000:.2f} kg/m"
+                )
+                # Minimum bending radius: 12 x OD for unarmoured, 15 x OD for armoured
+                bend_factor = 15 if armour != "unarmoured" else 12
+                min_bend = dims['od'] * bend_factor
+                dim_col3.metric(
+                    "Min. Bending Radius",
+                    f"{min_bend:.0f} mm",
+                    f"{bend_factor} x OD"
+                )
+
+                # Cable length total weight (if length is meaningful)
+                total_weight = (dims['weight'] / 1000) * length_m
+                st.info(
+                    f"📦 For **{length_m:.0f} m** of cable: total weight ≈ "
+                    f"**{total_weight:.1f} kg** ({total_weight/1000:.3f} tons)"
+                )
+            else:
+                st.warning(
+                    f"⚠ Dimensions not available in catalog for "
+                    f"{res.size_mm2} mm² {conductor.upper()}/{armour.upper()} "
+                    f"({'single-core' if is_sc else f'{lookup_cores}-core'}). "
+                    f"Check Elsewedy catalog for this specific configuration."
+                )
 
             notes = [w for w in res.warnings if w.startswith("NOTE:")]
             warnings_only = [w for w in res.warnings if not w.startswith("NOTE:")]
