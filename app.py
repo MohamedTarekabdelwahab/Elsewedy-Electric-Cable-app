@@ -664,7 +664,12 @@ render_price_ticker()
 
 st.markdown("---")
 
-tab1, tab_vf, tab2 = st.tabs(["Cable Size Calculator", "Price Variance (VF)", "Technical Support"])
+tab1, tab_vf, tab_conduit, tab2 = st.tabs([
+    "Cable Size Calculator",
+    "Price Variance (VF)",
+    "Conduit Fill",
+    "Technical Support"
+])
 
 with tab1:
     st.subheader("Cable Size Selection - Elsewedy Catalog (IEC 60502)")
@@ -1083,6 +1088,323 @@ Sales = {quoted_price:,.2f} + {price_adjustment:+,.4f}
 Sales = {sales_price:,.2f} SAR/m
 ```
             """)
+
+
+with tab_conduit:
+    st.subheader("Conduit Fill Calculator (IEC 61386 / NEC 344)")
+    st.markdown(
+        "Check if cables fit in the selected conduit size according to fill ratio standards."
+    )
+
+    # ── Standard Conduit Sizes (Internal Diameter in mm) ──
+    # PVC conduits (common sizes in Saudi Arabia)
+    CONDUIT_PVC = {
+        "20 mm":   {"trade": "20 mm",   "id": 17.0, "od": 20.0},
+        "25 mm":   {"trade": "25 mm",   "id": 21.4, "od": 25.0},
+        "32 mm":   {"trade": "32 mm",   "id": 27.8, "od": 32.0},
+        "40 mm":   {"trade": "40 mm",   "id": 35.4, "od": 40.0},
+        "50 mm":   {"trade": "50 mm",   "id": 44.3, "od": 50.0},
+        "63 mm":   {"trade": "63 mm",   "id": 57.0, "od": 63.0},
+        "75 mm":   {"trade": "75 mm",   "id": 67.8, "od": 75.0},
+        "90 mm":   {"trade": "90 mm",   "id": 81.4, "od": 90.0},
+        "110 mm":  {"trade": "110 mm",  "id": 99.4, "od": 110.0},
+        "125 mm":  {"trade": "125 mm",  "id": 113.0, "od": 125.0},
+        "160 mm":  {"trade": "160 mm",  "id": 144.6, "od": 160.0},
+        "200 mm":  {"trade": "200 mm",  "id": 180.8, "od": 200.0},
+    }
+    # GI (Galvanized Iron) conduits
+    CONDUIT_GI = {
+        "20 mm (3/4\")": {"trade": "20 mm",   "id": 17.0, "od": 20.0},
+        "25 mm (1\")":   {"trade": "25 mm",   "id": 21.6, "od": 25.0},
+        "32 mm (1.25\")": {"trade": "32 mm",  "id": 28.0, "od": 32.0},
+        "40 mm (1.5\")": {"trade": "40 mm",   "id": 35.0, "od": 40.0},
+        "50 mm (2\")":   {"trade": "50 mm",   "id": 44.0, "od": 50.0},
+        "65 mm (2.5\")": {"trade": "65 mm",   "id": 57.0, "od": 65.0},
+        "80 mm (3\")":   {"trade": "80 mm",   "id": 72.0, "od": 80.0},
+        "100 mm (4\")":  {"trade": "100 mm",  "id": 98.0, "od": 100.0},
+        "125 mm (5\")":  {"trade": "125 mm",  "id": 123.0, "od": 125.0},
+        "150 mm (6\")":  {"trade": "150 mm",  "id": 148.0, "od": 150.0},
+    }
+
+    # ── Cable OD Estimation (approximate, based on Elsewedy catalog averages) ──
+    def estimate_cable_od(cores, cross_section, armoured=False):
+        """
+        Estimate cable outer diameter in mm.
+        Based on typical LV multicore cables (Cu/XLPE or Cu/PVC).
+        """
+        if cross_section <= 16:
+            base_od = math.sqrt(cross_section) * 1.6 + 4
+        elif cross_section <= 95:
+            base_od = math.sqrt(cross_section) * 1.5 + 5
+        else:
+            base_od = math.sqrt(cross_section) * 1.4 + 8
+
+        # Adjust for number of cores
+        # 1 core uses base_od directly
+        # 2+ cores: multiplier based on cable geometry
+        if cores == 1:
+            od = base_od
+        elif cores == 2:
+            od = base_od * 1.7
+        elif cores == 3:
+            od = base_od * 1.9
+        elif cores == 4:
+            od = base_od * 2.1
+        elif cores == 5:
+            od = base_od * 2.25
+        else:
+            od = base_od * (2.0 + cores * 0.05)
+
+        # Armour adds ~3 mm
+        if armoured:
+            od += 3
+
+        return round(od, 1)
+
+    # ── IEC / NEC Fill Ratios ──
+    FILL_RATIOS = {
+        1: 0.53,   # 53% for single cable
+        2: 0.31,   # 31% for two cables
+        "3+": 0.40 # 40% for three or more cables
+    }
+
+    st.markdown("---")
+    st.markdown("### Step 1: Cable Specifications")
+
+    cf_mode = st.radio(
+        "Cable OD Input",
+        ["Calculate from cable specs", "Enter OD manually"],
+        horizontal=True,
+        help="Calculate automatically from cores + mm², or enter outer diameter directly"
+    )
+
+    if cf_mode == "Calculate from cable specs":
+        cf_col1, cf_col2, cf_col3 = st.columns(3)
+        with cf_col1:
+            cf_num_cables = st.number_input(
+                "Number of cables",
+                min_value=1, max_value=100, value=3, step=1,
+                help="How many cables will run in the same conduit"
+            )
+        with cf_col2:
+            cf_cores = st.number_input(
+                "Cores per cable",
+                min_value=1, max_value=61, value=4, step=1
+            )
+        with cf_col3:
+            cf_cross_section = st.number_input(
+                "Cross section (mm2)",
+                min_value=1.5, max_value=1000.0, value=25.0, step=0.5
+            )
+
+        cf_armoured = st.checkbox("Armoured cable (SWA/STA)", value=False,
+                                   help="Adds ~3 mm to the outer diameter")
+
+        cable_od = estimate_cable_od(cf_cores, cf_cross_section, cf_armoured)
+        st.info(
+            f"Estimated cable OD: **{cable_od} mm** "
+            f"(for {cf_cores}x{cf_cross_section} mm² "
+            f"{'armoured' if cf_armoured else 'unarmoured'} cable)"
+        )
+    else:
+        cf_col1, cf_col2 = st.columns(2)
+        with cf_col1:
+            cf_num_cables = st.number_input(
+                "Number of cables",
+                min_value=1, max_value=100, value=3, step=1
+            )
+        with cf_col2:
+            cable_od = st.number_input(
+                "Cable outer diameter (mm)",
+                min_value=1.0, max_value=200.0, value=20.0, step=0.5,
+                help="Outer diameter from cable datasheet"
+            )
+
+    st.markdown("---")
+    st.markdown("### Step 2: Conduit Selection")
+
+    cond_col1, cond_col2 = st.columns(2)
+    with cond_col1:
+        conduit_type = st.selectbox(
+            "Conduit material",
+            ["PVC", "GI (Galvanized Iron)"],
+            help="PVC is most common indoors; GI for mechanical protection"
+        )
+    with cond_col2:
+        conduit_dict = CONDUIT_PVC if conduit_type == "PVC" else CONDUIT_GI
+        conduit_size_key = st.selectbox(
+            "Conduit trade size",
+            list(conduit_dict.keys()),
+            help="Standard trade sizes available in KSA market"
+        )
+
+    conduit = conduit_dict[conduit_size_key]
+    conduit_id = conduit["id"]
+    conduit_od = conduit["od"]
+
+    # ── Calculations ──
+    # Areas
+    cable_area_each = math.pi * (cable_od / 2) ** 2
+    total_cable_area = cable_area_each * cf_num_cables
+    conduit_area = math.pi * (conduit_id / 2) ** 2
+
+    # Fill ratio
+    fill_pct = (total_cable_area / conduit_area) * 100
+
+    # Allowed fill based on number of cables
+    if cf_num_cables == 1:
+        allowed_fill_pct = 53
+        fill_rule = "Single cable (IEC 53%)"
+    elif cf_num_cables == 2:
+        allowed_fill_pct = 31
+        fill_rule = "Two cables (IEC 31%)"
+    else:
+        allowed_fill_pct = 40
+        fill_rule = "3+ cables (IEC/NEC 40%)"
+
+    passed = fill_pct <= allowed_fill_pct
+    margin = allowed_fill_pct - fill_pct
+
+    st.markdown("---")
+    st.markdown("### Step 3: Results")
+
+    # ── Visual pass/fail box ──
+    if passed:
+        color = "#2e7d32"
+        status = "PASS"
+        arrow = "✓"
+        bg = "#e8f5e9"
+    else:
+        color = "#d32f2f"
+        status = "FAIL"
+        arrow = "✗"
+        bg = "#ffebee"
+
+    result_html = f"""
+    <div style="background: {bg};
+                border-left: 6px solid {color};
+                border-radius: 10px;
+                padding: 20px;
+                margin: 15px 0;
+                text-align: center;">
+        <div style="color: {color}; font-size: 13px; font-weight: 700; letter-spacing: 2px;">
+            {arrow} CONDUIT FILL CHECK: {status}
+        </div>
+        <div style="color: {color}; font-size: 36px; font-weight: 800; margin: 10px 0;">
+            {fill_pct:.1f}%
+        </div>
+        <div style="color: #333; font-size: 14px;">
+            Allowed: <b>{allowed_fill_pct}%</b>  |  Margin: <b>{margin:+.1f}%</b>
+        </div>
+        <div style="color: #666; font-size: 12px; margin-top: 8px;">
+            {fill_rule}
+        </div>
+    </div>
+    """
+    st.markdown(result_html, unsafe_allow_html=True)
+
+    # ── Detailed metrics ──
+    m_col1, m_col2, m_col3 = st.columns(3)
+    m_col1.metric(
+        "Cable Area (each)",
+        f"{cable_area_each:.1f} mm²",
+        f"OD = {cable_od} mm"
+    )
+    m_col2.metric(
+        "Total Cable Area",
+        f"{total_cable_area:.1f} mm²",
+        f"{cf_num_cables} cable(s)"
+    )
+    m_col3.metric(
+        "Conduit Inner Area",
+        f"{conduit_area:.1f} mm²",
+        f"ID = {conduit_id} mm"
+    )
+
+    # ── Recommendations ──
+    if not passed:
+        # Find minimum required conduit size
+        recommended = None
+        for size_key, cond in conduit_dict.items():
+            cond_area_check = math.pi * (cond["id"] / 2) ** 2
+            fill_check = (total_cable_area / cond_area_check) * 100
+            if fill_check <= allowed_fill_pct:
+                recommended = (size_key, cond, fill_check)
+                break
+
+        if recommended:
+            rec_key, rec_cond, rec_fill = recommended
+            st.error(
+                f"**FAIL — Conduit too small!**  "
+                f"Fill ratio {fill_pct:.1f}% exceeds allowed {allowed_fill_pct}%."
+            )
+            st.success(
+                f"**Recommended size:** {rec_key} {conduit_type} "
+                f"(ID = {rec_cond['id']} mm, fill = {rec_fill:.1f}%)"
+            )
+        else:
+            st.error(
+                f"**FAIL** — Even the largest {conduit_type} conduit in the list is not enough. "
+                f"Consider splitting cables into multiple conduits."
+            )
+    else:
+        # Suggest smaller conduit if margin is large
+        if margin > 15:
+            smaller_sizes = list(conduit_dict.keys())
+            current_index = smaller_sizes.index(conduit_size_key)
+            if current_index > 0:
+                smaller_key = smaller_sizes[current_index - 1]
+                smaller_cond = conduit_dict[smaller_key]
+                smaller_area = math.pi * (smaller_cond["id"] / 2) ** 2
+                smaller_fill = (total_cable_area / smaller_area) * 100
+                if smaller_fill <= allowed_fill_pct:
+                    st.info(
+                        f"**Cost saving tip:** A smaller {smaller_key} conduit would also work "
+                        f"(fill = {smaller_fill:.1f}%, still ≤ {allowed_fill_pct}%)."
+                    )
+        st.success(
+            f"**PASS** — Fill ratio {fill_pct:.1f}% is within allowed {allowed_fill_pct}% limit. "
+            f"Safe margin: {margin:.1f}%."
+        )
+
+    # ── Formula breakdown ──
+    with st.expander("Show formula breakdown"):
+        st.markdown(f"""
+**Step 1 - Cable Area (each):**
+```
+A_cable = π × (OD/2)²
+A_cable = π × ({cable_od}/2)²
+A_cable = {cable_area_each:.2f} mm²
+```
+
+**Step 2 - Total Cable Area:**
+```
+A_total = A_cable × Number of cables
+A_total = {cable_area_each:.2f} × {cf_num_cables}
+A_total = {total_cable_area:.2f} mm²
+```
+
+**Step 3 - Conduit Inner Area:**
+```
+A_conduit = π × (ID/2)²
+A_conduit = π × ({conduit_id}/2)²
+A_conduit = {conduit_area:.2f} mm²
+```
+
+**Step 4 - Fill Ratio:**
+```
+Fill % = (A_total / A_conduit) × 100
+Fill % = ({total_cable_area:.2f} / {conduit_area:.2f}) × 100
+Fill % = {fill_pct:.2f}%
+```
+
+**IEC / NEC Fill Limits:**
+- 1 cable → 53% max
+- 2 cables → 31% max
+- 3+ cables → **40% max** (most common case)
+
+**Current rule applied:** {fill_rule}
+        """)
 
 
 with tab2:
